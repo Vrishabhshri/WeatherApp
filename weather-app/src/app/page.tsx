@@ -2,18 +2,19 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import axios from 'axios';
 
 export default function Home() {
 
-  const [weather, setWeather] = useState(null)
+  const [weather, setWeather] = useState<any>(null)
   const [location, setLocation] = useState('')
   const [isLocationEntered, setLocationEntered] = useState(false)
 
   const colorIntensities = [400, 500, 600, 700, 800, 900, 950];
 
-  const tempData = {
-    "London": -19
-  }
+  // const tempData = {
+  //   "London": -19
+  // }
 
   const handleInputBarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -21,44 +22,101 @@ export default function Home() {
 
   }
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
 
-    if (tempData[location]) {
+    // if (tempData[location]) {
 
-      setWeather(tempData[location]);
+    //   setWeather(tempData[location]);
+    //   setLocationEntered(true)
+
+    // }
+    // else {
+
+    //   alert('Location could not be found')
+
+    // }
+
+    if (location.trim() === '') {
+
+      alert('Please enter a location');
+      return;
+
+    }
+
+    try {
+
+      const APIKey = process.env.NEXT_PUBLIC_API_KEY;
+
+      const params: any = {appid: APIKey, units: 'imperial'};
+
+      // Updating params based on input type Zip Code/Coordinates/Location name
+      if (isZipCode(location)) {
+
+        params["zip"] = location;
+
+      }
+      else if (isCoords(location)) {
+
+        const [lat, lon] = location.split(',').map(coord => parseFloat(coord.trim()))
+        params["lat"] = lat;
+        params["lon"] = lon;
+
+      }
+      else {
+
+        params["q"] = location;
+
+      }
+
+      const response = await axios.get('https://api.openweathermap.org/data/2.5/weather', { params });
+
+      const { lat, lon } = response.data.coord;
+      const uvResponse = await axios.get(`https://api.openweathermap.org/data/2.5/uvi?appid=${APIKey}&lat=${lat}&lon=${lon}`);
+
+      setWeather({ ...response.data, uvIndex: uvResponse.data.value })
       setLocationEntered(true)
 
     }
-    else {
+    catch(error) {
 
-      alert('Location could not be found')
-
-    }
-
-  }
-
-  const calcBackgroundColorFromTemp = (temp: number) => {
-
-    if (temp < 32) {
-
-      const normalized = (temp + 20) / 52;
-      const scaled = normalized * (colorIntensities.length - 1);
-      const intensity = colorIntensities[colorIntensities.length - 1 - Math.round(scaled)]
-
-      return intensity
-
-    }
-    else {
-
-      const normalized = (temp - 33) / 77;
-      const scaled = normalized * (colorIntensities.length - 1);
-      const intensity = colorIntensities[Math.round(scaled)]
-
-      return intensity
+      alert('Sorry, location could not be found');
+      console.error(error);
 
     }
 
   }
+
+  const isZipCode = (str: string) => /^\d{5}(-\d{4})?$/.test(str);
+  const isCoords = (str: string) => /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(str);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+
+    if (e.key === 'Enter') handleSearch();
+
+  }
+
+  // const calcBackgroundColorFromTemp = (temp: number) => {
+
+  //   if (temp < 32) {
+
+  //     const normalized = (temp + 20) / 52;
+  //     const scaled = normalized * (colorIntensities.length - 1);
+  //     const intensity = colorIntensities[colorIntensities.length - 1 - Math.round(scaled)]
+
+  //     return intensity
+
+  //   }
+  //   else {
+
+  //     const normalized = (temp - 33) / 77;
+  //     const scaled = normalized * (colorIntensities.length - 1);
+  //     const intensity = colorIntensities[Math.round(scaled)]
+
+  //     return intensity
+
+  //   }
+
+  // }
 
   return (
     
@@ -67,12 +125,12 @@ export default function Home() {
                   w-screen h-screen 
                   flex flex-col min-h-screen justify-center items-center
                   transition-colors duration-1000 ease-in-and-out 
-                  ${weather !== null ? (weather < 32 ? 'bg-blue-500' : 'bg-orange-500') : ''}`}>
+                  ${weather !== null ? (weather.main.temp < 32 ? 'bg-blue-500' : 'bg-orange-500') : ''}`}>
 
       {/* Title */}
       <h1 
-        className={`text-black font-bold mb-6 
-                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-320px] text-2xl' : 'text-5xl'}`}>
+        className={`text-black font-bold mb-6 text-5xl
+                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-320px]' : ''}`}>
         Weather App
       </h1>
 
@@ -85,6 +143,7 @@ export default function Home() {
           className="w-200 border-2 border-black rounded-full px-4 py-1"
           value={location}
           onChange={handleInputBarChange}
+          onKeyDown={handleKeyDown}
         />
 
         <button 
@@ -101,9 +160,19 @@ export default function Home() {
 
       </div>
 
+      {/* Showing weather location when location has been entered */}
       {isLocationEntered && weather && (<div className="">
 
-        <p>Current temperature in {location}: {weather}°F</p>
+        <div>
+
+          <p>Temperature: {weather.main.temp} °F</p>
+          <p>Feels like: {weather.main.feels_like} °F</p>
+          <p>Humidity: {weather.main.humidity}</p>
+          <p>Precipitation: {weather.rain ? weather.rain['1h'] : 0}</p>
+          <p>Wind Speed: {weather.wind.speed}</p>
+          <p>UV Index: {weather.uvIndex}</p>
+
+        </div>
 
       </div>)}
 
