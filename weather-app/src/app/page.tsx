@@ -97,10 +97,10 @@ export default function Home() {
       const forecastResponse = await axios.get('https://api.openweathermap.org/data/2.5/forecast', { params });
 
       const forecastList = forecastResponse.data.list;
-      const dailyForecast = forecastList.filter((item: any, index: number) => )
+      const dailyForecast = forecastList.filter((item: any, index: number) => index % 8 === 0)
       
       // Settin weather for easy access in html
-      setWeather({ ...weatherResponse.data, uvIndex: uvResponse.data.value, condition: weatherResponse.data.weather[0].main })
+      setWeather({ ...weatherResponse.data, uvIndex: uvResponse.data.value, condition: weatherResponse.data.weather[0].main, forecast: dailyForecast })
       // Notifying that a location has been entered
       setLocationEntered(true)
       // Clearing suggestions once a location has been selected
@@ -214,9 +214,28 @@ export default function Home() {
 
         <div className='border border-2 border-black rounded-lg
                         h-24
-                        mb-4'>
+                        mb-4
+                        flex flex-row items-center justify-center
+                        gap-6'>
 
+          {weather && weather.forecast.map((day: any, index: number) => {
 
+            const date = new Date(day.dt * 1000);
+            const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' });
+
+            return (<div key={index}>
+
+              <div>
+
+                <p>{day.weather[0].description}</p>
+                <p>{dayOfWeek}</p>
+                <p>{day.main.temp} °F</p>
+
+              </div>
+
+            </div>)
+
+          })}
 
         </div>
 
