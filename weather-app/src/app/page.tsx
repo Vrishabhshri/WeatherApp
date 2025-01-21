@@ -8,10 +8,10 @@ export default function Home() {
 
   const [weather, setWeather] = useState<any>(null)
   const [location, setLocation] = useState('')
+  const [weatherCondition, setWeatherCondition] = useState<string>("")
   const [isLocationEntered, setLocationEntered] = useState(false)
   const [suggestions, setSuggestions] = useState<any>([])
 
-  const colorIntensities = [400, 500, 600, 700, 800, 900, 950];
   const APIKey = process.env.NEXT_PUBLIC_API_KEY;
 
   const handleInputBarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +42,7 @@ export default function Home() {
 
     let selectedLocation;
 
-    if (clickedLocation) {
+    if (clickedLocation && clickedLocation._targetInst) {
 
       selectedLocation = `${clickedLocation.lat},${clickedLocation.lon}`;
       setLocation(clickedLocation.name + ', ' + clickedLocation.state + ', ' + clickedLocation.country);
@@ -50,7 +50,9 @@ export default function Home() {
     }
     else {
 
-      selectedLocation = location
+      const slArr = location.split(',')
+      slArr.map(element => element.trim())
+      selectedLocation = slArr.join(', ')
 
     }
 
@@ -86,6 +88,8 @@ export default function Home() {
 
       const response = await axios.get('https://api.openweathermap.org/data/2.5/weather', { params });
 
+      setWeatherCondition(response.data.weather[0].main)
+
       const { lat, lon } = response.data.coord;
       const uvResponse = await axios.get(`https://api.openweathermap.org/data/2.5/uvi?appid=${APIKey}&lat=${lat}&lon=${lon}`);
 
@@ -112,25 +116,22 @@ export default function Home() {
 
   }
 
-  const weatherCondition = (id: number) => {
+  const calcBackgroundColorFromCondition = (condition: string) => {
 
-    if (id < 300 && id >= 200) return "Thunderstorm";
-    if (id < 400 && id >= 300) return "Drizzle";
-    if (id < 600 && id >= 500) return "Rain";
-    if (id < 700 && id >= 600) return "Snow";
-    if (id < 800 && id >= 700) return "Atmopsheric";
-    if (id === 800) return "Clear";
-    if (id < 900 && id > 800) return "Clouds";
+    switch (condition) {
 
-    return "Unkown weather condition"
+      case "Thunderstorm": return "bg-gray-800";
+      case "Drizzle": return "bg-gray-500";
+      case "Rain": return "bg-gray-500";
+      case "Snow": return "bg-gray-500";
+      case "Atmospheric": return "bg-blue-400";
+      case "Clear": return "bg-blue-600";
+      case "Clouds": return "bg-gray-500";
+      default: return "bg-white"
+
+    }
 
   }
-
-  // const calcBackgroundColorFromTemp = (temp: number) => {
-
-
-
-  // }
 
   return (
     
@@ -139,17 +140,17 @@ export default function Home() {
                   w-screen h-screen 
                   flex flex-col min-h-screen justify-center items-center
                   transition-colors duration-1000 ease-in-and-out 
-                  ${weather !== null ? 'bg-blue-500' : ''}`}>
+                  ${weatherCondition !== "" ? calcBackgroundColorFromCondition(weatherCondition) : ''}`}>
 
       {/* Title */}
       <h1 
         className={`text-black font-bold mb-6 text-5xl
-                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-380px]' : ''}`}>
+                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-290px]' : ''}`}>
         Weather App
       </h1>
 
       {/* Input bar and button */}
-      <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-380px]' : ''}`}>
+      <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-290px]' : ''}`}>
 
         <div className='flex flex-col'>
 
@@ -201,29 +202,62 @@ export default function Home() {
       {/* Showing weather location when location has been entered */}
       {isLocationEntered && weather && (<div className="">
 
-        <div className='flex flex-row'>
+        <div className='grid grid-cols-3 gap-4'>
 
-          <div className='border border-black'>
-            <p>Temperature: {weather.main.temp} °F</p>
+          <div className='border border-black w-48 h-24'>
+
+            <div className='flex items-center gap-2'>
+
+              {/* Thermometer icon */}
+              <Image
+              src="/thermometer.svg"
+              alt='Thermometer icon'
+              width={24}
+              height={24}
+              >
+              </Image>
+
+              {/* Temperature value */}
+              <p>Temperature: {weather.main.temp} °F</p>
+
+            </div>
+
           </div>
 
-          <div className='border border-black'>
+          <div className='border border-black w-48 h-24'>
             <p>Feels like: {weather.main.feels_like} °F</p>
           </div>
 
-          <div className='border border-black'>
+          <div className='border border-black w-48 h-24'>
             <p>Humidity: {weather.main.humidity}</p>
           </div>
 
-          <div className='border border-black'>
-            <p>Precipitation: {weather.rain ? weather.rain['1h'] : 0}</p>
+          <div className='border border-black w-48 h-24'>
+            
+            <div className='flex items-center gap-2'>
+
+              {/* Rain icon */}
+              <Image
+              src="/rain.svg"
+              alt='Rain icon'
+              width={24}
+              height={24}
+              >
+              </Image>
+
+              {/* Precipitation value */}
+              <p>Precipitation: {weather.rain ? weather.rain['1h'] : 0}</p>
+
+
+            </div>
+
           </div>
 
-          <div className='border border-black'>
+          <div className='border border-black w-48 h-24'>
             <p>Wind Speed: {weather.wind.speed}</p>
           </div>
 
-          <div className='border border-black'>
+          <div className='border border-black w-48 h-24'>
             <p>UV Index: {weather.uvIndex}</p>
           </div>
 
