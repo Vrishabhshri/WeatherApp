@@ -9,18 +9,52 @@ export default function Home() {
   const [weather, setWeather] = useState<any>(null)
   const [location, setLocation] = useState('')
   const [isLocationEntered, setLocationEntered] = useState(false)
+  const [suggestions, setSuggestions] = useState<any>([])
 
   const colorIntensities = [400, 500, 600, 700, 800, 900, 950];
+  const APIKey = process.env.NEXT_PUBLIC_API_KEY;
 
-  const handleInputBarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputBarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
-    setLocation(e.target.value);
+    const input = e.target.value;
+    setLocation(input);
+
+    if (input.trim() === '') {
+      setSuggestions([])
+      return
+    }
+
+    try {
+
+      const response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=5&appid=${APIKey}`);
+      setSuggestions(response.data)
+
+    }
+    catch (error) {
+
+      console.error('Error fetching suggested locations:', error)
+
+    }
 
   }
 
-  const handleSearch = async () => {
+  const handleSearch = async (clickedLocation?: any) => {
 
-    if (location.trim() === '') {
+    let selectedLocation;
+
+    if (clickedLocation) {
+
+      selectedLocation = `${clickedLocation.lat},${clickedLocation.lon}`;
+      setLocation(clickedLocation.name + ', ' + clickedLocation.state + ', ' + clickedLocation.country);
+
+    }
+    else {
+
+      selectedLocation = location
+
+    }
+
+    if (selectedLocation.trim() === '') {
 
       alert('Please enter a location');
       return;
@@ -29,28 +63,24 @@ export default function Home() {
 
     try {
 
-      const APIKey = process.env.NEXT_PUBLIC_API_KEY;
-
       const params: any = {appid: APIKey, units: 'imperial'};
 
-      console.log(isCoords(location))
-
       // Updating params based on input type Zip Code/Coordinates/Location name
-      if (isZipCode(location)) {
+      if (isZipCode(selectedLocation)) {
 
-        params["zip"] = location;
+        params["zip"] = selectedLocation;
 
       }
-      else if (isCoords(location)) {
+      else if (isCoords(selectedLocation)) {
 
-        const [lat, lon] = location.split(',').map(coord => parseFloat(coord.trim()))
+        const [lat, lon] = selectedLocation.split(',').map(coord => parseFloat(coord.trim()))
         params["lat"] = lat;
         params["lon"] = lon;
 
       }
       else {
 
-        params["q"] = location;
+        params["q"] = selectedLocation;
 
       }
 
@@ -61,6 +91,7 @@ export default function Home() {
 
       setWeather({ ...response.data, uvIndex: uvResponse.data.value })
       setLocationEntered(true)
+      setSuggestions([])
 
     }
     catch(error) {
@@ -73,7 +104,7 @@ export default function Home() {
   }
 
   const isZipCode = (str: string) => /^\d{5}(-\d{4})?$/.test(str);
-  const isCoords = (str: string) => /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(str);
+  const isCoords = (str: string) => /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(str);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
@@ -123,14 +154,38 @@ export default function Home() {
       {/* Input bar and button */}
       <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-380px]' : ''}`}>
 
-        <input
-          type="text"
-          placeholder="Enter current location"
-          className="w-200 border-2 border-black rounded-full px-4 py-1"
-          value={location}
-          onChange={handleInputBarChange}
-          onKeyDown={handleKeyDown}
-        />
+        <div className='flex flex-col'>
+
+          <input
+            type="text"
+            placeholder="Enter current location"
+            className="w-200 border-2 border-black rounded-full px-4 py-1 focus:outline-none"
+            value={location}
+            onChange={handleInputBarChange}
+            onKeyDown={handleKeyDown}
+          />
+
+          {/* Suggestions list */}
+          {suggestions.length > 0 && (
+
+            <ul className='absolute translate-y-[35px]'>
+
+              {suggestions.map((suggestion: any, index: number) => (
+
+                <li key={index} onClick={() => handleSearch(suggestion)} 
+                    className='px-4 py-2 hover:bg-blue-300 cursor-pointer rounded-lg'>
+
+                  {suggestion.name}, {suggestion.state}, {suggestion.country}
+
+                </li>
+
+              ))}
+
+            </ul>
+
+          )}
+
+        </div>
 
         <button 
           className="px-4 py-1 bg-yellow-600 rounded-full"
