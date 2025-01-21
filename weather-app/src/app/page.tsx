@@ -142,6 +142,82 @@ export default function Home() {
 
   }
 
+  const calcIconFromCondition = (condition: string) => {
+
+    switch (condition) {
+
+      case "Thunderstorm": return (
+
+        <Image
+        src="/icons/thunderstorm.svg"
+        alt='Thunderstorm icon'
+        width={24}
+        height={24}
+        >
+        </Image>
+
+      )
+      case "Drizzle": return (
+
+        <Image
+        src="/icons/rain.svg"
+        alt='Drizzle icon'
+        width={24}
+        height={24}
+        >
+        </Image>
+
+      )
+      case "Rain": return (
+
+        <Image
+        src="/icons/rain.svg"
+        alt='Rain icon'
+        width={24}
+        height={24}
+        >
+        </Image>
+
+      )
+      case "Snow": return (
+
+        <Image
+        src="/icons/snow.svg"
+        alt='Snow icon'
+        width={24}
+        height={24}
+        >
+        </Image>
+
+      )
+      case "Clear": return (
+
+        <Image
+        src="/icons/thunderstorm.svg"
+        alt='Thunderstorm icon'
+        width={24}
+        height={24}
+        >
+        </Image>
+
+      )
+      case "Clouds": return (
+
+        <Image
+        src="/icons/clouds.svg"
+        alt='Clouds icon'
+        width={24}
+        height={24}
+        >
+        </Image>
+
+      )
+      default: return "bg-white"
+
+    }
+
+  }
+
   return (
     
     <div 
@@ -200,7 +276,7 @@ export default function Home() {
           onClick={handleSearch}
         >
           <Image
-            src="/search-icon-button.png"
+            src="/icons/search-icon-button.png"
             width={25}
             height={25}
             alt="search icon image"
@@ -216,7 +292,7 @@ export default function Home() {
                         h-24
                         mb-4
                         flex flex-row items-center justify-center
-                        gap-6'>
+                        gap-14'>
 
           {weather && weather.forecast.map((day: any, index: number) => {
 
@@ -227,7 +303,7 @@ export default function Home() {
 
               <div>
 
-                <p>{day.weather[0].description}</p>
+                {calcIconFromCondition(day.weather[0].main)}
                 <p>{dayOfWeek}</p>
                 <p>{day.main.temp} °F</p>
 
@@ -247,7 +323,7 @@ export default function Home() {
 
               {/* Thermometer icon */}
               <Image
-              src="/thermometer.svg"
+              src="/icons/thermometer.svg"
               alt='Thermometer icon'
               width={24}
               height={24}
@@ -265,9 +341,9 @@ export default function Home() {
 
             <div className='flex items-center gap-2'>
 
-              {/* Thermometer icon */}
+              {/* Feels like icon */}
               <Image
-              src="/thermometer.svg"
+              src="/icons/thermometer.svg"
               alt='Thermometer icon'
               width={24}
               height={24}
@@ -282,17 +358,34 @@ export default function Home() {
           </div>
 
           <div className={widgetBoxes}>
-            <p>Humidity: {weather && weather.main.humidity}</p>
+            
+            <div className='flex items-center gap-2'>
+
+              {/* Humid icon */}
+              <Image
+              src="/icons/humid.svg"
+              alt='Humid icon'
+              width={24}
+              height={24}
+              >
+              </Image>
+
+              {/* Humid value */}
+              <p>Humidity: {weather && weather.main.humidity}</p>
+
+
+            </div>
+
           </div>
 
           <div className={widgetBoxes}>
             
             <div className='flex items-center gap-2'>
 
-              {/* Rain icon */}
+              {/* Precipitation icon */}
               <Image
-              src="/rain.svg"
-              alt='Rain icon'
+              src="/icons/precipitation.svg"
+              alt='Precipitation icon'
               width={24}
               height={24}
               >
@@ -307,11 +400,45 @@ export default function Home() {
           </div>
 
           <div className={widgetBoxes}>
-            <p>Wind Speed: {weather && weather.wind.speed}</p>
+            
+            <div className='flex items-center gap-2'>
+
+              {/* Wind speed icon */}
+              <Image
+              src="/icons/wind.svg"
+              alt='Wind speed icon'
+              width={24}
+              height={24}
+              >
+              </Image>
+
+              {/* Wind speed value */}
+              <p>Wind Speed: {weather && weather.wind.speed}</p>
+
+
+            </div>
+
           </div>
 
           <div className={widgetBoxes}>
-            <p>UV Index: {weather && weather.uvIndex}</p>
+            
+            <div className='flex items-center gap-2'>
+
+              {/* UV Index icon */}
+              <Image
+              src="/icons/uv.svg"
+              alt='UV Index icon'
+              width={24}
+              height={24}
+              >
+              </Image>
+
+              {/* UV Index value */}
+              <p>UV Index: {weather && weather.uvIndex}</p>
+
+
+            </div>
+
           </div>
 
         </div>
