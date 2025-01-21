@@ -14,6 +14,9 @@ export default {
         coldColor: "#03045e",
         hotColor: "#dc2f02"
       },
+      fontFamily: {
+        rubik: ["var(--font-rubik)"]
+      }
     },
   },
   plugins: [],

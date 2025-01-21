@@ -12,10 +12,6 @@ export default function Home() {
 
   const colorIntensities = [400, 500, 600, 700, 800, 900, 950];
 
-  // const tempData = {
-  //   "London": -19
-  // }
-
   const handleInputBarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     setLocation(e.target.value);
@@ -23,18 +19,6 @@ export default function Home() {
   }
 
   const handleSearch = async () => {
-
-    // if (tempData[location]) {
-
-    //   setWeather(tempData[location]);
-    //   setLocationEntered(true)
-
-    // }
-    // else {
-
-    //   alert('Location could not be found')
-
-    // }
 
     if (location.trim() === '') {
 
@@ -48,6 +32,8 @@ export default function Home() {
       const APIKey = process.env.NEXT_PUBLIC_API_KEY;
 
       const params: any = {appid: APIKey, units: 'imperial'};
+
+      console.log(isCoords(location))
 
       // Updating params based on input type Zip Code/Coordinates/Location name
       if (isZipCode(location)) {
@@ -79,7 +65,7 @@ export default function Home() {
     }
     catch(error) {
 
-      alert('Sorry, location could not be found');
+      alert('Sorry, location could not be found. Make sure input is valid.');
       console.error(error);
 
     }
@@ -130,12 +116,12 @@ export default function Home() {
       {/* Title */}
       <h1 
         className={`text-black font-bold mb-6 text-5xl
-                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-320px]' : ''}`}>
+                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-380px]' : ''}`}>
         Weather App
       </h1>
 
       {/* Input bar and button */}
-      <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-320px]' : ''}`}>
+      <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-380px]' : ''}`}>
 
         <input
           type="text"
@@ -163,14 +149,31 @@ export default function Home() {
       {/* Showing weather location when location has been entered */}
       {isLocationEntered && weather && (<div className="">
 
-        <div>
+        <div className='flex flex-row'>
 
-          <p>Temperature: {weather.main.temp} °F</p>
-          <p>Feels like: {weather.main.feels_like} °F</p>
-          <p>Humidity: {weather.main.humidity}</p>
-          <p>Precipitation: {weather.rain ? weather.rain['1h'] : 0}</p>
-          <p>Wind Speed: {weather.wind.speed}</p>
-          <p>UV Index: {weather.uvIndex}</p>
+          <div className='border border-black'>
+            <p>Temperature: {weather.main.temp} °F</p>
+          </div>
+
+          <div className='border border-black'>
+            <p>Feels like: {weather.main.feels_like} °F</p>
+          </div>
+
+          <div className='border border-black'>
+            <p>Humidity: {weather.main.humidity}</p>
+          </div>
+
+          <div className='border border-black'>
+            <p>Precipitation: {weather.rain ? weather.rain['1h'] : 0}</p>
+          </div>
+
+          <div className='border border-black'>
+            <p>Wind Speed: {weather.wind.speed}</p>
+          </div>
+
+          <div className='border border-black'>
+            <p>UV Index: {weather.uvIndex}</p>
+          </div>
 
         </div>
 
