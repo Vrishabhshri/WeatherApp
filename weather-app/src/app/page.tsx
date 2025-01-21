@@ -112,26 +112,23 @@ export default function Home() {
 
   }
 
+  const weatherCondition = (id: number) => {
+
+    if (id < 300 && id >= 200) return "Thunderstorm";
+    if (id < 400 && id >= 300) return "Drizzle";
+    if (id < 600 && id >= 500) return "Rain";
+    if (id < 700 && id >= 600) return "Snow";
+    if (id < 800 && id >= 700) return "Atmopsheric";
+    if (id === 800) return "Clear";
+    if (id < 900 && id > 800) return "Clouds";
+
+    return "Unkown weather condition"
+
+  }
+
   // const calcBackgroundColorFromTemp = (temp: number) => {
 
-  //   if (temp < 32) {
 
-  //     const normalized = (temp + 20) / 52;
-  //     const scaled = normalized * (colorIntensities.length - 1);
-  //     const intensity = colorIntensities[colorIntensities.length - 1 - Math.round(scaled)]
-
-  //     return intensity
-
-  //   }
-  //   else {
-
-  //     const normalized = (temp - 33) / 77;
-  //     const scaled = normalized * (colorIntensities.length - 1);
-  //     const intensity = colorIntensities[Math.round(scaled)]
-
-  //     return intensity
-
-  //   }
 
   // }
 
@@ -142,7 +139,7 @@ export default function Home() {
                   w-screen h-screen 
                   flex flex-col min-h-screen justify-center items-center
                   transition-colors duration-1000 ease-in-and-out 
-                  ${weather !== null ? (weather.main.temp < 32 ? 'bg-blue-500' : 'bg-orange-500') : ''}`}>
+                  ${weather !== null ? 'bg-blue-500' : ''}`}>
 
       {/* Title */}
       <h1 
