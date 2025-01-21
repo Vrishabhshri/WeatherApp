@@ -8,11 +8,15 @@ export default function Home() {
 
   const [weather, setWeather] = useState<any>(null)
   const [location, setLocation] = useState('')
-  const [weatherCondition, setWeatherCondition] = useState<string>("")
   const [isLocationEntered, setLocationEntered] = useState(false)
   const [suggestions, setSuggestions] = useState<any>([])
 
   const APIKey = process.env.NEXT_PUBLIC_API_KEY;
+  const widgetBoxes = `border border-2 border-black rounded-lg 
+                      w-52 h-24 
+                      flex items-center justify-center 
+                      transition-all duration-200
+                      hover:bg-gray-400 hover:scale-105`;
 
   const handleInputBarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -86,15 +90,20 @@ export default function Home() {
 
       }
 
-      const response = await axios.get('https://api.openweathermap.org/data/2.5/weather', { params });
-
-      setWeatherCondition(response.data.weather[0].main)
-
-      const { lat, lon } = response.data.coord;
+      // Fetching weather, forecast, and uv index
+      const weatherResponse = await axios.get('https://api.openweathermap.org/data/2.5/weather', { params });
+      const { lat, lon } = weatherResponse.data.coord;
       const uvResponse = await axios.get(`https://api.openweathermap.org/data/2.5/uvi?appid=${APIKey}&lat=${lat}&lon=${lon}`);
+      const forecastResponse = await axios.get('https://api.openweathermap.org/data/2.5/forecast', { params });
 
-      setWeather({ ...response.data, uvIndex: uvResponse.data.value })
+      const forecastList = forecastResponse.data.list;
+      const dailyForecast = forecastList.filter((item: any, index: number) => )
+      
+      // Settin weather for easy access in html
+      setWeather({ ...weatherResponse.data, uvIndex: uvResponse.data.value, condition: weatherResponse.data.weather[0].main })
+      // Notifying that a location has been entered
       setLocationEntered(true)
+      // Clearing suggestions once a location has been selected
       setSuggestions([])
 
     }
@@ -125,7 +134,7 @@ export default function Home() {
       case "Rain": return "bg-gray-500";
       case "Snow": return "bg-gray-500";
       case "Atmospheric": return "bg-blue-400";
-      case "Clear": return "bg-blue-600";
+      case "Clear": return "bg-blue-500";
       case "Clouds": return "bg-gray-500";
       default: return "bg-white"
 
@@ -140,17 +149,18 @@ export default function Home() {
                   w-screen h-screen 
                   flex flex-col min-h-screen justify-center items-center
                   transition-colors duration-1000 ease-in-and-out 
-                  ${weatherCondition !== "" ? calcBackgroundColorFromCondition(weatherCondition) : ''}`}>
+                  ${weather !== null ? calcBackgroundColorFromCondition(weather.condition) : ''}
+                  overflow-hidden`}>
 
       {/* Title */}
       <h1 
         className={`text-black font-bold mb-6 text-5xl
-                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-290px]' : ''}`}>
+                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-220px]' : 'translate-y-[100px]'}`}>
         Weather App
       </h1>
 
       {/* Input bar and button */}
-      <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-290px]' : ''}`}>
+      <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-220px]' : 'translate-y-[100px]'}`}>
 
         <div className='flex flex-col'>
 
@@ -171,7 +181,7 @@ export default function Home() {
               {suggestions.map((suggestion: any, index: number) => (
 
                 <li key={index} onClick={() => handleSearch(suggestion)} 
-                    className='px-4 py-2 hover:bg-blue-300 cursor-pointer rounded-lg'>
+                    className='px-4 py-1 hover:bg-blue-300 cursor-pointer rounded-lg'>
 
                   {suggestion.name}, {suggestion.state}, {suggestion.country}
 
@@ -200,11 +210,19 @@ export default function Home() {
       </div>
 
       {/* Showing weather location when location has been entered */}
-      {isLocationEntered && weather && (<div className="">
+      <div className={`transition-all duration-1000 ${(isLocationEntered && weather) ? '' : 'translate-y-[510px]'}`}>
 
-        <div className='grid grid-cols-3 gap-4'>
+        <div className='border border-2 border-black rounded-lg
+                        h-24
+                        mb-4'>
 
-          <div className='border border-black w-48 h-24'>
+
+
+        </div>
+
+        <div className='grid grid-cols-3 gap-10'>
+
+          <div className={widgetBoxes}>
 
             <div className='flex items-center gap-2'>
 
@@ -218,21 +236,37 @@ export default function Home() {
               </Image>
 
               {/* Temperature value */}
-              <p>Temperature: {weather.main.temp} °F</p>
+              <p>Temperature: {weather && weather.main.temp} °F</p>
 
             </div>
 
           </div>
 
-          <div className='border border-black w-48 h-24'>
-            <p>Feels like: {weather.main.feels_like} °F</p>
+          <div className={widgetBoxes}>
+
+            <div className='flex items-center gap-2'>
+
+              {/* Thermometer icon */}
+              <Image
+              src="/thermometer.svg"
+              alt='Thermometer icon'
+              width={24}
+              height={24}
+              >
+              </Image>
+
+              {/* Feels like value */}
+              <p>Feels like: {weather && weather.main.feels_like} °F</p>
+
+            </div>
+
           </div>
 
-          <div className='border border-black w-48 h-24'>
-            <p>Humidity: {weather.main.humidity}</p>
+          <div className={widgetBoxes}>
+            <p>Humidity: {weather && weather.main.humidity}</p>
           </div>
 
-          <div className='border border-black w-48 h-24'>
+          <div className={widgetBoxes}>
             
             <div className='flex items-center gap-2'>
 
@@ -246,24 +280,24 @@ export default function Home() {
               </Image>
 
               {/* Precipitation value */}
-              <p>Precipitation: {weather.rain ? weather.rain['1h'] : 0}</p>
+              <p>Precipitation: {weather && weather.rain ? weather.rain['1h'] : 0}</p>
 
 
             </div>
 
           </div>
 
-          <div className='border border-black w-48 h-24'>
-            <p>Wind Speed: {weather.wind.speed}</p>
+          <div className={widgetBoxes}>
+            <p>Wind Speed: {weather && weather.wind.speed}</p>
           </div>
 
-          <div className='border border-black w-48 h-24'>
-            <p>UV Index: {weather.uvIndex}</p>
+          <div className={widgetBoxes}>
+            <p>UV Index: {weather && weather.uvIndex}</p>
           </div>
 
         </div>
 
-      </div>)}
+      </div>
 
     </div>
 

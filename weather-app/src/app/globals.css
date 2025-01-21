@@ -17,11 +17,6 @@ body {
   margin: 0;
 }
 
-.cloud {
-  width: 100px;
-  height: 60px;
-  background: white;
-  border-radius: 50%;
-  position: relative;
-  box-shadow: 20px 10px 0px 0px white, -20px 10px 0px 0px white, 0px 30px 0px 0px white;
+.parent-container {
+  overflow: visible;
 }
