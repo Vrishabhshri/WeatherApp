@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { calcBackgroundColorFromCondition, calcIconFromCondition } from '@/utils/pageFunctions';
 
 export default function Home() {
 
@@ -12,6 +14,7 @@ export default function Home() {
   const [suggestions, setSuggestions] = useState<any>([])
   const [recents, setRecents] = useState<any>([]);
 
+  const router = useRouter();
   const APIKey = process.env.NEXT_PUBLIC_API_KEY;
   const widgetBoxes = `border border-2 border-black rounded-lg 
                       w-full sm:w-40 md:w-44 lg:w-48 xl:w-52 h-24
@@ -181,109 +184,6 @@ export default function Home() {
 
   }
 
-  const calcBackgroundColorFromCondition = (condition: string) => {
-
-    switch (condition) {
-
-      case "Thunderstorm": return "bg-gray-800";
-      case "Drizzle": return "bg-gray-500";
-      case "Rain": return "bg-gray-500";
-      case "Snow": return "bg-gray-500";
-      case "Atmospheric": return "bg-blue-400";
-      case "Clear": return "bg-blue-500";
-      case "Clouds": return "bg-gray-500";
-      default: return "bg-white"
-
-    }
-
-  }
-
-  const calcIconFromCondition = (condition: string) => {
-
-    switch (condition) {
-
-      case "Thunderstorm": return (
-
-        <Image
-        src="/icons/thunderstorm.svg"
-        alt='Thunderstorm icon'
-        width={24}
-        height={24}
-        >
-        </Image>
-
-      )
-      case "Drizzle": return (
-
-        <Image
-        src="/icons/rain.svg"
-        alt='Drizzle icon'
-        width={24}
-        height={24}
-        >
-        </Image>
-
-      )
-      case "Rain": return (
-
-        <Image
-        src="/icons/rain.svg"
-        alt='Rain icon'
-        width={24}
-        height={24}
-        >
-        </Image>
-
-      )
-      case "Snow": return (
-
-        <Image
-        src="/icons/snow.svg"
-        alt='Snow icon'
-        width={24}
-        height={24}
-        >
-        </Image>
-
-      )
-      case "Clear": return (
-
-        <Image
-        src="/icons/thunderstorm.svg"
-        alt='Thunderstorm icon'
-        width={24}
-        height={24}
-        >
-        </Image>
-
-      )
-      case "Clouds": return (
-
-        <Image
-        src="/icons/clouds.svg"
-        alt='Clouds icon'
-        width={24}
-        height={24}
-        >
-        </Image>
-
-      )
-      default: return (
-
-        <Image
-        src="/icons/default.svg"
-        alt='Default icon'
-        width={24}
-        height={24}
-        >
-        </Image>
-
-      )
-
-    }
-
-  }
-
   useEffect(() => {
 
     getRecents();
@@ -302,13 +202,25 @@ export default function Home() {
 
       <div>
 
-        {/* Title */}
-        <h1 
-          className={`text-black font-bold mb-6 text-5xl cursor-pointer w-[315px]
-                      transition-all duration-1000 ease-in-and-out ${isLocationEntered ? '' : 'mt-[200px]'}`}
-          onClick={() => window.location.reload()}>
-          Weather App
-        </h1>
+        <div className='flex flex-row items-center'>
+
+          {/* Title */}
+          <h1 
+            className={`text-black font-bold mb-6 text-5xl cursor-pointer w-[315px]
+                        transition-all duration-1000 ease-in-and-out ${isLocationEntered ? '' : 'mt-[200px]'}`}
+            onClick={() => window.location.reload()}>
+            Weather App
+          </h1>
+
+          {/* History button */}
+          <h1 
+            className={`text-black font-bold mb-6 text-xl cursor-pointer w-[315px]
+                        transition-all duration-1000 ease-in-and-out ${isLocationEntered ? '' : 'mt-[200px]'}`}
+            onClick={() => router.push('/history')}>
+            History
+          </h1>
+
+        </div>
 
         {/* Input bar and button */}
         <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out`}>
