@@ -1,15 +1,15 @@
 import connectMongoDB from '../../../utils/mongodb.js';
 import { NextResponse } from "next/server";
-import RecentLocation from '../../../models/RecentLocation.tsx';
+import DaterangeLocation from '../../../models/DaterangeLocation.tsx';
 
 export async function POST(req) {
 
     try {
 
-        const { city, country, lat, lon } = await req.json();
+        const { days, lat, lon, startDate, endDate } = await req.json();
         await connectMongoDB();
 
-        await RecentLocation.create({ city, country, lat, lon })
+        await DaterangeLocation.create({ days, lat, lon, startDate, endDate })
         return NextResponse.json({ message: "Location created" }, { status: 200 });
 
     }
@@ -27,8 +27,8 @@ export async function GET() {
     try {
 
         await connectMongoDB();
-        const recentLocations = await RecentLocation.find().sort({ createdAt: -1 });
-        return NextResponse.json({ recentLocations }, { status: 200 })
+        const daterangeLocations = await DaterangeLocation.find().sort({ createdAt: -1 });
+        return NextResponse.json({ daterangeLocations }, { status: 200 })
 
     }
     catch (error) {
@@ -48,7 +48,7 @@ export async function PUT(req) {
 
         const { lat, lon, updates } = await req.json();
 
-        await RecentLocation.findOneAndUpdate(
+        await DaterangeLocation.findOneAndUpdate(
 
             { lat, lon },
             { $set: updates },
@@ -74,7 +74,7 @@ export async function DELETE(req) {
 
         await connectMongoDB();
         const id = req.nextUrl.searchParams.get('id');
-        await RecentLocation.findByIdAndDelete(id);
+        await DaterangeLocation.findByIdAndDelete(id);
         return NextResponse.json({ message: "Successfully deleted location" }, { status: 200 })
 
     }

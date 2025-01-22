@@ -152,7 +152,11 @@ export default function Home() {
     try {
 
       const locationsResponse = await axios.get('/api/recentLocations');
-      setRecents(locationsResponse.data.recentLocations)
+      if (locationsResponse.data.recentLocations) {
+
+        setRecents(locationsResponse.data.recentLocations);
+
+      }
 
     }
     catch (error) {
@@ -475,9 +479,9 @@ export default function Home() {
             onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}
             >
 
-              <div className='ml-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
+              {/* <div className='ml-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
                 <Image src="/icons/update.svg" alt='Update icon' width={16} height={16}/>
-              </div>
+              </div> */}
 
               {recent.city}, {recent.country}
 

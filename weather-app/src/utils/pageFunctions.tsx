@@ -89,4 +89,4 @@ const calcIconFromCondition = (condition: string) => {
 const isZipCode = (str: string) => /^\d{5}(-\d{4})?$/.test(str);
 const isCoords = (str: string) => /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(str);
 
-export { calcBackgroundColorFromCondition, calcIconFromCondition, isZipCode, isCoords };
+export { calcIconFromCondition, isZipCode, isCoords };

@@ -17,6 +17,7 @@ export default function History() {
   const [highTemp, setHighTemp] = useState(0);
   const [highPrec, setHighPrec] = useState(0);
   const [avgFeelsLike, setAvgFeelsLike] = useState(0);
+  const [recents, setRecents] = useState<any>([]);
 
   const router = useRouter();
   const OPENWEATHERAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
@@ -57,7 +58,7 @@ export default function History() {
 
   }
 
-  const handleDateCheck = (startDate: Date, endDate: Date) => {
+  const handleDateCheck = (startDate: Date, endDate: Date, length: number) => {
 
     const timeDifference = endDate.getTime() - startDate.getTime();
 
@@ -65,7 +66,7 @@ export default function History() {
     // 1000 * 60 * 60 * 24
     const dayDifference = Math.floor(timeDifference / 86400000) + 1;
 
-    return dayDifference > 7;
+    return dayDifference > length;
 
   }
 
@@ -121,9 +122,16 @@ export default function History() {
 
     }
 
-    if (handleDateCheck(startDateObject, endDateObject)) {
+    if (handleDateCheck(startDateObject, endDateObject, 7)) {
 
       alert('Please enter a date range no longer than 7 days');
+      return;
+
+    }
+
+    if (handleDateCheck(startDateObject, today, 16)) {
+
+      alert('Please enter a start date less than 16 days ago');
       return;
 
     }
@@ -191,6 +199,16 @@ export default function History() {
         calcAverageFeelsLike(data.days);
         calcHighPrec(data.days);
 
+        await axios.post('/api/daterangeLocations', {
+          days: data.days,
+          lat: lat,
+          lon: lon,
+          startDate: startDate,
+          endDate: endDate
+        });
+
+        getRecents();
+
       }
 
     }
@@ -214,6 +232,26 @@ export default function History() {
         setLocation(latitude + "," + longitude);
 
       })
+
+    }
+
+  }
+
+  const getRecents = async () => {
+
+    try {
+
+      const locationsResponse = await axios.get('/api/daterangeLocations');
+      if (locationsResponse.data.daterangeLocations) {
+
+        setRecents(locationsResponse.data.daterangeLocations);
+
+      }
+
+    }
+    catch (error) {
+
+      console.log("Error fetching recent locations:", error)
 
     }
 
@@ -276,6 +314,12 @@ export default function History() {
     setHighPrec(highest);
 
   }
+
+  useEffect(() => {
+
+    getRecents();
+
+  }, []);
 
   return (
 
@@ -484,6 +528,35 @@ export default function History() {
         </div>
 
       </div>
+
+    </div>
+
+    {/* Recents */}
+    <div className={`ml-12 w-1/6 flex flex-col gap-4 max-h-[600px]
+                                            cursor-pointer overflow-y-auto no-scrollbar border border-black`}>
+
+        {recents.map((recent, index: number) => (
+
+          <div 
+          key={index} 
+          className='border border-2 border-black rounded-lg
+                      w-full h-12
+                      sm:text-xs md:text-sm lg:text-base xl:text-lg
+                      flex items-center justify-between
+                      transition-all duration-200
+                      hover:bg-gray-400' 
+          onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}
+          >
+
+            {recent.city}, {recent.country}
+
+            {/* <div className='mr-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
+              <Image src="/icons/x.svg" alt='Delete icon' width={12} height={12}/>
+            </div> */}
+
+          </div>
+
+        ))}
 
     </div>
 
