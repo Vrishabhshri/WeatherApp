@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import axios from 'axios';
 
@@ -10,6 +10,7 @@ export default function Home() {
   const [location, setLocation] = useState('')
   const [isLocationEntered, setLocationEntered] = useState(false)
   const [suggestions, setSuggestions] = useState<any>([])
+  const [recents, setRecents] = useState<any>([]);
 
   const APIKey = process.env.NEXT_PUBLIC_API_KEY;
   const widgetBoxes = `border border-2 border-black rounded-lg 
@@ -98,6 +99,13 @@ export default function Home() {
 
       const forecastList = forecastResponse.data.list;
       const dailyForecast = forecastList.filter((item: any, index: number) => index % 8 === 0)
+
+      await axios.post('/api', {
+        city: weatherResponse.data.name,
+        country: weatherResponse.data.sys.country,
+        lat: lat,
+        lon: lon,
+      });
       
       // Settin weather for easy access in html
       setWeather({ ...weatherResponse.data, uvIndex: uvResponse.data.value, condition: weatherResponse.data.weather[0].main, forecast: dailyForecast })
@@ -122,6 +130,22 @@ export default function Home() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
     if (e.key === 'Enter') handleSearch();
+
+  }
+
+  const getRecents = async () => {
+
+    try {
+
+      const locationsResponse = await axios.get('/api');
+      setRecents(locationsResponse.data)
+
+    }
+    catch (error) {
+
+      console.log("Error fetching recent locations:", error)
+
+    }
 
   }
 
@@ -218,6 +242,12 @@ export default function Home() {
 
   }
 
+  useEffect(() => {
+
+    getRecents();
+
+  }, []);
+
   return (
     
     <div 
@@ -282,6 +312,13 @@ export default function Home() {
             alt="search icon image"
           />
         </button>
+
+      </div>
+
+      {/* Recents */}
+      <div>
+
+
 
       </div>
 

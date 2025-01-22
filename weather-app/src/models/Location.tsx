@@ -1,12 +1,17 @@
 import mongoose from 'mongoose';
 
-const locationStruct = new mongoose.Schema({
+const locationSchema = new mongoose.Schema(
+    {
+        city: String,
+        country: String,
+        lat: Number,
+        lon: Number
+    },
+    {
+        timestamps: true
+    }
+)
 
-    city: String,
-    country: String,
-    lat: Number,
-    lon: Number,
-    timestamp: { type: Date, default: Date.now }
+const Location = mongoose.models.Location || mongoose.model("Location", locationSchema);
 
-})
-
+export default Location;
