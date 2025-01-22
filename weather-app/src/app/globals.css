@@ -18,5 +18,5 @@ body {
 }
 
 .parent-container {
-  overflow: visible;
+  overflow: hidden;
 }

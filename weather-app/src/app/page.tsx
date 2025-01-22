@@ -47,8 +47,6 @@ export default function Home() {
 
     let selectedLocation;
 
-    console.log(clickedLocation);
-
     if (typeof clickedLocation !== "string") {
 
       selectedLocation = `${clickedLocation.lat},${clickedLocation.lon}`;
@@ -115,6 +113,8 @@ export default function Home() {
       setLocationEntered(true)
       // Clearing suggestions once a location has been selected
       setSuggestions([])
+      getRecents();
+      console.log(recents);
 
     }
     catch(error) {
@@ -132,6 +132,12 @@ export default function Home() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
     if (e.key === 'Enter') handleSearch(location);
+
+  }
+
+  const deleteLocation = (id: number) => {
+
+    
 
   }
 
@@ -272,7 +278,7 @@ export default function Home() {
     <div 
       className={`border-2 border-black 
                   w-screen h-screen 
-                  flex flex-col min-h-screen justify-center items-center
+                  flex flex-row min-h-screen justify-center items-center
                   transition-colors duration-1000 ease-in-and-out 
                   ${weather !== null ? calcBackgroundColorFromCondition(weather.condition) : ''}
                   overflow-hidden`}>
@@ -344,23 +350,6 @@ export default function Home() {
           </button>
 
         </div>
-
-        {/* Recents */}
-        {!isLocationEntered && <div className={`grid grid-cols-3 gap-4
-                          translate-y-[200px]
-                          cursor-pointer`}>
-
-            {recents.map((recent, index: number) => (
-
-              <div key={index} className={widgetBoxes} onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}>
-
-                {recent.city}, {recent.country}
-
-              </div>
-
-            ))}
-
-        </div>}
 
         {/* Showing weather location when location has been entered */}
         <div className={`transition-all duration-1000 ease-in-and-out ${(isLocationEntered && weather) ? '' : 'translate-y-[510px]'}`}>
@@ -521,6 +510,39 @@ export default function Home() {
           </div>
 
         </div>
+
+      </div>
+
+      {/* Recents */}
+      <div className={`translate-x-[100px] w-1/6 flex flex-col gap-4 max-h-[600px]
+                                              cursor-pointer overflow-y-auto`}>
+
+          {recents.map((recent, index: number) => (
+
+            <div 
+            key={index} 
+            className='border border-2 border-black rounded-lg
+                        w-52 h-24 
+                        flex items-center justify-between
+                        transition-all duration-200
+                        hover:bg-gray-400' 
+            onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}
+            >
+
+              <div className='ml-1' onClick={(e) => { e.stopPropagation(); console.log(recent); }}>
+                <Image src="/icons/update.svg" alt='Update icon' width={16} height={16}/>
+              </div>
+
+              {recent.city}, {recent.country}
+
+              <div className='mr-1' onClick={(e) => { e.stopPropagation(); console.log("Delete clicked"); }}>
+                <Image src="/icons/x.svg" alt='Delete icon' width={12} height={12}/>
+              </div>
+
+            </div>
+
+          ))}
+
       </div>
 
     </div>

@@ -27,7 +27,7 @@ export async function GET() {
     try {
 
         await connectMongoDB();
-        const recentLocations = await RecentLocation.find().sort({ createdAt: -1 }).limit(6);
+        const recentLocations = await RecentLocation.find().sort({ createdAt: -1 });
         return NextResponse.json({ recentLocations }, { status: 200 })
 
     }
@@ -63,6 +63,28 @@ export async function PUT(req) {
 
         console.log(error);
         return NextResponse.json({ message: "Error updating recent location" }, { status: 500 });
+
+    }
+
+}
+
+export async function DELETE(req) {
+
+    try {
+
+        await connectMongoDB();
+
+        const { id } = req.nextUrl.searchParams.get('id');
+
+        
+
+        return NextResponse.json({ recentLocations }, { status: 200 })
+
+    }
+    catch (error) {
+
+        console.log(error);
+        return NextResponse.json({ message: "Error fetching recent locations" }, { status: 500 });
 
     }
 
