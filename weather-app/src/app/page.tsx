@@ -47,7 +47,9 @@ export default function Home() {
 
     let selectedLocation;
 
-    if (clickedLocation && clickedLocation._targetInst) {
+    console.log(clickedLocation);
+
+    if (typeof clickedLocation !== "string") {
 
       selectedLocation = `${clickedLocation.lat},${clickedLocation.lon}`;
       setLocation(clickedLocation.name + ', ' + clickedLocation.state + ', ' + clickedLocation.country);
@@ -55,7 +57,7 @@ export default function Home() {
     }
     else {
 
-      const slArr = location.split(',')
+      const slArr = clickedLocation.split(',')
       slArr.map(element => element.trim())
       selectedLocation = slArr.join(', ')
 
@@ -100,12 +102,27 @@ export default function Home() {
       const forecastList = forecastResponse.data.list;
       const dailyForecast = forecastList.filter((item: any, index: number) => index % 8 === 0)
 
-      await axios.post('/api/recentLocations', {
-        city: weatherResponse.data.name,
-        country: weatherResponse.data.sys.country,
-        lat: lat,
-        lon: lon,
+      const existingLocations = await axios.get(`/api/recentLocations`, {
+        params: {
+          lat, lon
+        }
       });
+
+      if (existingLocations.data.recentLocations.length > 0) {
+
+        await axios.put('api/recentLocations', { lat, lon, updates: { timestamp: new Date() } })
+
+      }
+      else {
+
+        await axios.post('/api/recentLocations', {
+          city: weatherResponse.data.name,
+          country: weatherResponse.data.sys.country,
+          lat: lat,
+          lon: lon,
+        });
+
+      }
       
       // Settin weather for easy access in html
       setWeather({ ...weatherResponse.data, uvIndex: uvResponse.data.value, condition: weatherResponse.data.weather[0].main, forecast: dailyForecast })
@@ -129,7 +146,7 @@ export default function Home() {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
-    if (e.key === 'Enter') handleSearch();
+    if (e.key === 'Enter') handleSearch(location);
 
   }
 
@@ -145,6 +162,23 @@ export default function Home() {
     catch (error) {
 
       console.log("Error fetching recent locations:", error)
+
+    }
+
+  }
+
+  const getUserLocation = () => {
+
+    if (navigator.geolocation) {
+
+      navigator.geolocation.getCurrentPosition( async (position) => {
+
+        const { latitude, longitude } = position.coords
+
+        handleSearch(latitude + "," + longitude);
+        setLocation(latitude + "," + longitude);
+
+      })
 
     }
 
@@ -262,12 +296,12 @@ export default function Home() {
       {/* Title */}
       <h1 
         className={`text-black font-bold mb-6 text-5xl
-                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-220px]' : 'translate-y-[100px]'}`}>
+                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-120px]' : 'translate-y-[100px]'}`}>
         Weather App
       </h1>
 
       {/* Input bar and button */}
-      <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-220px]' : 'translate-y-[100px]'}`}>
+      <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-120px]' : 'translate-y-[100px]'}`}>
 
         <div className='flex flex-col'>
 
@@ -314,17 +348,25 @@ export default function Home() {
           />
         </button>
 
+        <button 
+          className="px-4 py-1 bg-yellow-600 rounded-full"
+          onClick={getUserLocation}
+        >
+          My location
+
+        </button>
+
       </div>
 
       {/* Recents */}
-      <div className={`border border-black
-                      grid grid-cols-3 gap-4
-                      translate-y-[200px]
-                      ${isLocationEntered ? 'opacity-0' : ''}`}>
+      {recents.length > 0 && <div className={`grid grid-cols-3 gap-4
+                                              transition-all duration-1000
+                                              ${isLocationEntered ? 'translate-y-[620px]' : 'translate-y-[300px]'}
+                                              cursor-pointer`}>
 
           {recents.map((recent, index: number) => (
 
-            <div key={index} className={widgetBoxes}>
+            <div key={index} className={widgetBoxes} onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}>
 
               {recent.city}, {recent.country}
 
@@ -332,7 +374,7 @@ export default function Home() {
 
           ))}
 
-      </div>
+      </div>}
 
       {/* Showing weather location when location has been entered */}
       <div className={`transition-all duration-1000 ${(isLocationEntered && weather) ? '' : 'translate-y-[510px]'}`}>

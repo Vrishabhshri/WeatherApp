@@ -22,33 +22,26 @@ export async function POST(req) {
 
 }
 
-export async function GET() {
-
-    try {
-
-        await connectMongoDB();
-        const recentLocations = await RecentLocation.find().sort({ timestamp: -1 }).limit(6);
-        return NextResponse.json({ recentLocations }, { status: 200 })
-
-    }
-    catch (error) {
-
-        console.log(error);
-        return NextResponse.json({ message: "Error fetching recent locations" }, { status: 500 });
-
-    }
-
-}
-
 export async function GET(req) {
 
     try {
 
         await connectMongoDB();
 
-        const { lat, lon } = req.nextUrl.searchParams;
+        const lat = req.nextUrl.searchParams.get('lat');
+        const lon = req.nextUrl.searchParams.get('lon');
+        let recentLocations;
 
-        const recentLocations = await RecentLocation.find({ lat, lon });
+        if (lat && lon) {
+
+            recentLocations = await RecentLocation.find({ lat, lon });
+            
+        }
+        else {
+
+            recentLocations = await RecentLocation.find().sort({ timestamp: -1 }).limit(6);
+
+        }
 
         return NextResponse.json({ recentLocations }, { status: 200 })
 
