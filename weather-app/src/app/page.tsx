@@ -375,7 +375,7 @@ export default function Home() {
           <div className='border border-2 border-black rounded-lg
                           h-24
                           mb-4
-                          mt-4
+                          mt-24
                           flex flex-row items-center justify-center
                           gap-14'>
 
