@@ -31,7 +31,7 @@ export default function Home() {
 
     try {
 
-      const response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=5&appid=${APIKey}`);
+      const response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=3&appid=${APIKey}`);
       setSuggestions(response.data)
 
     }
@@ -102,27 +102,12 @@ export default function Home() {
       const forecastList = forecastResponse.data.list;
       const dailyForecast = forecastList.filter((item: any, index: number) => index % 8 === 0)
 
-      const existingLocations = await axios.get(`/api/recentLocations`, {
-        params: {
-          lat, lon
-        }
+      await axios.post('/api/recentLocations', {
+        city: weatherResponse.data.name,
+        country: weatherResponse.data.sys.country,
+        lat: lat,
+        lon: lon,
       });
-
-      if (existingLocations.data.recentLocations.length > 0) {
-
-        await axios.put('api/recentLocations', { lat, lon, updates: { timestamp: new Date() } })
-
-      }
-      else {
-
-        await axios.post('/api/recentLocations', {
-          city: weatherResponse.data.name,
-          country: weatherResponse.data.sys.country,
-          lat: lat,
-          lon: lon,
-        });
-
-      }
       
       // Settin weather for easy access in html
       setWeather({ ...weatherResponse.data, uvIndex: uvResponse.data.value, condition: weatherResponse.data.weather[0].main, forecast: dailyForecast })
@@ -155,7 +140,6 @@ export default function Home() {
     try {
 
       const locationsResponse = await axios.get('/api/recentLocations');
-      console.log(locationsResponse.data.recentLocations);
       setRecents(locationsResponse.data.recentLocations)
 
     }
@@ -295,8 +279,9 @@ export default function Home() {
 
       {/* Title */}
       <h1 
-        className={`text-black font-bold mb-6 text-5xl
-                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-120px]' : 'translate-y-[100px]'}`}>
+        className={`text-black font-bold mb-6 text-5xl cursor-pointer
+                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-120px]' : 'translate-y-[100px]'}`}
+        onClick={() => window.location.reload()}>
         Weather App
       </h1>
 
@@ -359,10 +344,9 @@ export default function Home() {
       </div>
 
       {/* Recents */}
-      {recents.length > 0 && <div className={`grid grid-cols-3 gap-4
-                                              transition-all duration-1000
-                                              ${isLocationEntered ? 'translate-y-[620px]' : 'translate-y-[300px]'}
-                                              cursor-pointer`}>
+      {!isLocationEntered && <div className={`grid grid-cols-3 gap-4
+                        translate-y-[200px]
+                        cursor-pointer`}>
 
           {recents.map((recent, index: number) => (
 
@@ -377,7 +361,7 @@ export default function Home() {
       </div>}
 
       {/* Showing weather location when location has been entered */}
-      <div className={`transition-all duration-1000 ${(isLocationEntered && weather) ? '' : 'translate-y-[510px]'}`}>
+      <div className={`transition-all duration-1000 ease-in-and-out ${(isLocationEntered && weather) ? '' : 'translate-y-[510px]'}`}>
 
         <div className='border border-2 border-black rounded-lg
                         h-24
