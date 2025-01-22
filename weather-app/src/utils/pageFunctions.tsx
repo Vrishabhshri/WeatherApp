@@ -1,22 +1,5 @@
 import Image from 'next/image';
 
-const calcBackgroundColorFromCondition = (condition: string) => {
-
-    switch (condition) {
-
-        case "Thunderstorm": return "bg-gray-800";
-        case "Drizzle": return "bg-gray-500";
-        case "Rain": return "bg-gray-500";
-        case "Snow": return "bg-gray-500";
-        case "Atmospheric": return "bg-blue-400";
-        case "Clear": return "bg-blue-500";
-        case "Clouds": return "bg-gray-500";
-        default: return "bg-white"
-
-    }
-
-}
-
 const calcIconFromCondition = (condition: string) => {
 
     switch (condition) {
@@ -103,4 +86,7 @@ const calcIconFromCondition = (condition: string) => {
 
 }
 
-export { calcBackgroundColorFromCondition, calcIconFromCondition };
+const isZipCode = (str: string) => /^\d{5}(-\d{4})?$/.test(str);
+const isCoords = (str: string) => /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(str);
+
+export { calcBackgroundColorFromCondition, calcIconFromCondition, isZipCode, isCoords };

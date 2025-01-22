@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { calcBackgroundColorFromCondition, calcIconFromCondition } from '@/utils/pageFunctions';
+import { calcIconFromCondition, isZipCode, isCoords } from '@/utils/pageFunctions';
 
 export default function Home() {
 
@@ -15,7 +15,7 @@ export default function Home() {
   const [recents, setRecents] = useState<any>([]);
 
   const router = useRouter();
-  const APIKey = process.env.NEXT_PUBLIC_API_KEY;
+  const APIKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
   const widgetBoxes = `border border-2 border-black rounded-lg 
                       w-full sm:w-40 md:w-44 lg:w-48 xl:w-52 h-24
                       sm:text-xs md:text-sm lg:text-base xl:text-lg
@@ -118,7 +118,6 @@ export default function Home() {
       // Clearing suggestions once a location has been selected
       setSuggestions([])
       getRecents();
-      console.log(recents);
 
     }
     catch(error) {
@@ -129,9 +128,6 @@ export default function Home() {
     }
 
   }
-
-  const isZipCode = (str: string) => /^\d{5}(-\d{4})?$/.test(str);
-  const isCoords = (str: string) => /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(str);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
@@ -183,6 +179,23 @@ export default function Home() {
     }
 
   }
+
+  const calcBackgroundColorFromCondition = (condition: string) => {
+
+    switch (condition) {
+
+        case "Thunderstorm": return "bg-gray-800";
+        case "Drizzle": return "bg-gray-500";
+        case "Rain": return "bg-gray-500";
+        case "Snow": return "bg-gray-500";
+        case "Atmospheric": return "bg-blue-400";
+        case "Clear": return "bg-blue-500";
+        case "Clouds": return "bg-gray-500";
+        default: return "bg-black"
+
+    }
+
+  } 
 
   useEffect(() => {
 
@@ -261,7 +274,7 @@ export default function Home() {
           {/* Search button */}
           <button 
             className="px-4 py-1 bg-yellow-600 rounded-full"
-            onClick={handleSearch}
+            onClick={() => handleSearch(location)}
           >
             <Image
               src="/icons/search-icon-button.png"
@@ -329,7 +342,7 @@ export default function Home() {
                 </Image>
 
                 {/* Temperature value */}
-                <p>Temperature: {weather && weather.main.temp} °F</p>
+                <p>Temperature: {weather && weather.main.temp.toFixed(2)} °F</p>
 
               </div>
 
@@ -349,7 +362,7 @@ export default function Home() {
                 </Image>
 
                 {/* Feels like value */}
-                <p>Feels like: {weather && weather.main.feels_like} °F</p>
+                <p>Feels like: {weather && weather.main.feels_like.toFixed(2)} °F</p>
 
               </div>
 
@@ -369,7 +382,7 @@ export default function Home() {
                 </Image>
 
                 {/* Humid value */}
-                <p>Humidity: {weather && weather.main.humidity}</p>
+                <p>Humidity: {weather && weather.main.humidity.toFixed(2)}</p>
 
 
               </div>
@@ -390,7 +403,7 @@ export default function Home() {
                 </Image>
 
                 {/* Precipitation value */}
-                <p>Precipitation: {weather && weather.rain ? weather.rain['1h'] : 0}</p>
+                <p>Precipitation: {weather && weather.rain ? weather.rain['1h'].toFixed(2) : 0}</p>
 
 
               </div>
@@ -411,7 +424,7 @@ export default function Home() {
                 </Image>
 
                 {/* Wind speed value */}
-                <p>Wind Speed: {weather && weather.wind.speed}</p>
+                <p>Wind Speed: {weather && weather.wind.speed.toFixed(2)}</p>
 
 
               </div>
@@ -432,7 +445,7 @@ export default function Home() {
                 </Image>
 
                 {/* UV Index value */}
-                <p>UV Index: {weather && weather.uvIndex}</p>
+                <p>UV Index: {weather && weather.uvIndex.toFixed(2)}</p>
 
 
               </div>
