@@ -14,7 +14,8 @@ export default function Home() {
 
   const APIKey = process.env.NEXT_PUBLIC_API_KEY;
   const widgetBoxes = `border border-2 border-black rounded-lg 
-                      w-52 h-24 
+                      w-full sm:w-40 md:w-44 lg:w-48 xl:w-52 h-24
+                      sm:text-xs md:text-sm lg:text-base xl:text-lg
                       flex items-center justify-center 
                       transition-all duration-200
                       hover:bg-gray-400 hover:scale-105`;
@@ -541,7 +542,8 @@ export default function Home() {
             <div 
             key={index} 
             className='border border-2 border-black rounded-lg
-                        w-52 h-12 
+                        w-full h-12
+                        sm:text-xs md:text-sm 
                         flex items-center justify-between
                         transition-all duration-200
                         hover:bg-gray-400' 
