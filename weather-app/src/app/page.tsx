@@ -137,7 +137,13 @@ export default function Home() {
 
   const deleteLocation = (id: number) => {
 
-    
+    axios.delete('/api/recentLocations', {
+      params: {
+        id: id
+      }
+    });
+
+    setTimeout(() => getRecents(), 50);
 
   }
 
@@ -261,7 +267,17 @@ export default function Home() {
         </Image>
 
       )
-      default: return "bg-white"
+      default: return (
+
+        <Image
+        src="/icons/default.svg"
+        alt='Default icon'
+        width={24}
+        height={24}
+        >
+        </Image>
+
+      )
 
     }
 
@@ -288,13 +304,13 @@ export default function Home() {
         {/* Title */}
         <h1 
           className={`text-black font-bold mb-6 text-5xl cursor-pointer
-                      transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-120px]' : 'translate-y-[100px]'}`}
+                      transition-all duration-1000 ease-in-and-out ${isLocationEntered ? '' : 'mt-[200px]'}`}
           onClick={() => window.location.reload()}>
           Weather App
         </h1>
 
         {/* Input bar and button */}
-        <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-120px]' : 'translate-y-[100px]'}`}>
+        <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out`}>
 
           <div className='flex flex-col'>
 
@@ -329,6 +345,7 @@ export default function Home() {
 
           </div>
 
+          {/* Search button */}
           <button 
             className="px-4 py-1 bg-yellow-600 rounded-full"
             onClick={handleSearch}
@@ -341,6 +358,7 @@ export default function Home() {
             />
           </button>
 
+          {/* My location button */}
           <button 
             className="px-4 py-1 bg-yellow-600 rounded-full"
             onClick={getUserLocation}
@@ -352,11 +370,12 @@ export default function Home() {
         </div>
 
         {/* Showing weather location when location has been entered */}
-        <div className={`transition-all duration-1000 ease-in-and-out ${(isLocationEntered && weather) ? '' : 'translate-y-[510px]'}`}>
+        <div className={`transition-all duration-1000 ease-in-and-out ${(isLocationEntered && weather) ? '' : 'translate-y-[1000px]'}`}>
 
           <div className='border border-2 border-black rounded-lg
                           h-24
                           mb-4
+                          mt-4
                           flex flex-row items-center justify-center
                           gap-14'>
 
@@ -522,20 +541,20 @@ export default function Home() {
             <div 
             key={index} 
             className='border border-2 border-black rounded-lg
-                        w-52 h-24 
+                        w-52 h-12 
                         flex items-center justify-between
                         transition-all duration-200
                         hover:bg-gray-400' 
             onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}
             >
 
-              <div className='ml-1' onClick={(e) => { e.stopPropagation(); console.log(recent); }}>
+              <div className='ml-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
                 <Image src="/icons/update.svg" alt='Update icon' width={16} height={16}/>
               </div>
 
               {recent.city}, {recent.country}
 
-              <div className='mr-1' onClick={(e) => { e.stopPropagation(); console.log("Delete clicked"); }}>
+              <div className='mr-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
                 <Image src="/icons/x.svg" alt='Delete icon' width={12} height={12}/>
               </div>
 

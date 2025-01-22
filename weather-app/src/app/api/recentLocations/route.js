@@ -73,12 +73,11 @@ export async function DELETE(req) {
     try {
 
         await connectMongoDB();
-
-        const { id } = req.nextUrl.searchParams.get('id');
-
-        
-
-        return NextResponse.json({ recentLocations }, { status: 200 })
+        const id = req.nextUrl.searchParams.get('id');
+        console.log(req.nextUrl);
+        console.log(id);
+        await RecentLocation.findByIdAndDelete(id);
+        return NextResponse.json({ message: "Successfully deleted location" }, { status: 200 })
 
     }
     catch (error) {
