@@ -534,8 +534,8 @@ export default function Home() {
       </div>
 
       {/* Recents */}
-      <div className={`translate-x-[100px] w-1/6 flex flex-col gap-4 max-h-[600px]
-                                              cursor-pointer overflow-y-auto`}>
+      <div className={`ml-12 w-1/6 flex flex-col gap-4 max-h-[600px]
+                                              cursor-pointer overflow-y-auto no-scrollbar`}>
 
           {recents.map((recent, index: number) => (
 
