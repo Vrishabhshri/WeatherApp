@@ -543,7 +543,7 @@ export default function Home() {
             key={index} 
             className='border border-2 border-black rounded-lg
                         w-full h-12
-                        sm:text-xs md:text-sm 
+                        sm:text-xs md:text-sm lg:text-base xl:text-lg
                         flex items-center justify-between
                         transition-all duration-200
                         hover:bg-gray-400' 
