@@ -100,7 +100,7 @@ export default function Home() {
       const forecastList = forecastResponse.data.list;
       const dailyForecast = forecastList.filter((item: any, index: number) => index % 8 === 0)
 
-      await axios.post('/api', {
+      await axios.post('/api/recentLocations', {
         city: weatherResponse.data.name,
         country: weatherResponse.data.sys.country,
         lat: lat,
@@ -137,8 +137,9 @@ export default function Home() {
 
     try {
 
-      const locationsResponse = await axios.get('/api');
-      setRecents(locationsResponse.data)
+      const locationsResponse = await axios.get('/api/recentLocations');
+      console.log(locationsResponse.data.recentLocations);
+      setRecents(locationsResponse.data.recentLocations)
 
     }
     catch (error) {
@@ -316,9 +317,20 @@ export default function Home() {
       </div>
 
       {/* Recents */}
-      <div>
+      <div className={`border border-black
+                      grid grid-cols-3 gap-4
+                      translate-y-[200px]
+                      ${isLocationEntered ? 'opacity-0' : ''}`}>
 
+          {recents.map((recent, index: number) => (
 
+            <div key={index} className={widgetBoxes}>
+
+              {recent.city}, {recent.country}
+
+            </div>
+
+          ))}
 
       </div>
 
