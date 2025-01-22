@@ -277,247 +277,250 @@ export default function Home() {
                   ${weather !== null ? calcBackgroundColorFromCondition(weather.condition) : ''}
                   overflow-hidden`}>
 
-      {/* Title */}
-      <h1 
-        className={`text-black font-bold mb-6 text-5xl cursor-pointer
-                    transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-120px]' : 'translate-y-[100px]'}`}
-        onClick={() => window.location.reload()}>
-        Weather App
-      </h1>
+      <div>
 
-      {/* Input bar and button */}
-      <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-120px]' : 'translate-y-[100px]'}`}>
+        {/* Title */}
+        <h1 
+          className={`text-black font-bold mb-6 text-5xl cursor-pointer
+                      transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-120px]' : 'translate-y-[100px]'}`}
+          onClick={() => window.location.reload()}>
+          Weather App
+        </h1>
 
-        <div className='flex flex-col'>
+        {/* Input bar and button */}
+        <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out ${isLocationEntered ? 'translate-y-[-120px]' : 'translate-y-[100px]'}`}>
 
-          <input
-            type="text"
-            placeholder="Enter current location"
-            className="w-200 border-2 border-black rounded-full px-4 py-1 focus:outline-none"
-            value={location}
-            onChange={handleInputBarChange}
-            onKeyDown={handleKeyDown}
-          />
+          <div className='flex flex-col'>
 
-          {/* Suggestions list */}
-          {suggestions.length > 0 && (
+            <input
+              type="text"
+              placeholder="Enter current location"
+              className="w-200 border-2 border-black rounded-full px-4 py-1 focus:outline-none"
+              value={location}
+              onChange={handleInputBarChange}
+              onKeyDown={handleKeyDown}
+            />
 
-            <ul className='absolute translate-y-[35px]'>
+            {/* Suggestions list */}
+            {suggestions.length > 0 && (
 
-              {suggestions.map((suggestion: any, index: number) => (
+              <ul className='absolute translate-y-[35px]'>
 
-                <li key={index} onClick={() => handleSearch(suggestion)} 
-                    className='px-4 py-1 hover:bg-blue-300 cursor-pointer rounded-lg'>
+                {suggestions.map((suggestion: any, index: number) => (
 
-                  {suggestion.name}, {suggestion.state}, {suggestion.country}
+                  <li key={index} onClick={() => handleSearch(suggestion)} 
+                      className='px-4 py-1 hover:bg-blue-300 cursor-pointer rounded-lg'>
 
-                </li>
+                    {suggestion.name}, {suggestion.state}, {suggestion.country}
 
-              ))}
+                  </li>
 
-            </ul>
+                ))}
 
-          )}
+              </ul>
+
+            )}
+
+          </div>
+
+          <button 
+            className="px-4 py-1 bg-yellow-600 rounded-full"
+            onClick={handleSearch}
+          >
+            <Image
+              src="/icons/search-icon-button.png"
+              width={25}
+              height={25}
+              alt="search icon image"
+            />
+          </button>
+
+          <button 
+            className="px-4 py-1 bg-yellow-600 rounded-full"
+            onClick={getUserLocation}
+          >
+            My location
+
+          </button>
 
         </div>
 
-        <button 
-          className="px-4 py-1 bg-yellow-600 rounded-full"
-          onClick={handleSearch}
-        >
-          <Image
-            src="/icons/search-icon-button.png"
-            width={25}
-            height={25}
-            alt="search icon image"
-          />
-        </button>
+        {/* Recents */}
+        {!isLocationEntered && <div className={`grid grid-cols-3 gap-4
+                          translate-y-[200px]
+                          cursor-pointer`}>
 
-        <button 
-          className="px-4 py-1 bg-yellow-600 rounded-full"
-          onClick={getUserLocation}
-        >
-          My location
+            {recents.map((recent, index: number) => (
 
-        </button>
+              <div key={index} className={widgetBoxes} onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}>
 
-      </div>
-
-      {/* Recents */}
-      {!isLocationEntered && <div className={`grid grid-cols-3 gap-4
-                        translate-y-[200px]
-                        cursor-pointer`}>
-
-          {recents.map((recent, index: number) => (
-
-            <div key={index} className={widgetBoxes} onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}>
-
-              {recent.city}, {recent.country}
-
-            </div>
-
-          ))}
-
-      </div>}
-
-      {/* Showing weather location when location has been entered */}
-      <div className={`transition-all duration-1000 ease-in-and-out ${(isLocationEntered && weather) ? '' : 'translate-y-[510px]'}`}>
-
-        <div className='border border-2 border-black rounded-lg
-                        h-24
-                        mb-4
-                        flex flex-row items-center justify-center
-                        gap-14'>
-
-          {weather && weather.forecast.map((day: any, index: number) => {
-
-            const date = new Date(day.dt * 1000);
-            const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' });
-
-            return (<div key={index}>
-
-              <div>
-
-                {calcIconFromCondition(day.weather[0].main)}
-                <p>{dayOfWeek}</p>
-                <p>{day.main.temp} °F</p>
+                {recent.city}, {recent.country}
 
               </div>
 
-            </div>)
+            ))}
 
-          })}
+        </div>}
+
+        {/* Showing weather location when location has been entered */}
+        <div className={`transition-all duration-1000 ease-in-and-out ${(isLocationEntered && weather) ? '' : 'translate-y-[510px]'}`}>
+
+          <div className='border border-2 border-black rounded-lg
+                          h-24
+                          mb-4
+                          flex flex-row items-center justify-center
+                          gap-14'>
+
+            {weather && weather.forecast.map((day: any, index: number) => {
+
+              const date = new Date(day.dt * 1000);
+              const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' });
+
+              return (<div key={index}>
+
+                <div>
+
+                  {calcIconFromCondition(day.weather[0].main)}
+                  <p>{dayOfWeek}</p>
+                  <p>{day.main.temp} °F</p>
+
+                </div>
+
+              </div>)
+
+            })}
+
+          </div>
+
+          <div className='grid grid-cols-3 gap-10'>
+
+            <div className={widgetBoxes}>
+
+              <div className='flex items-center gap-2'>
+
+                {/* Thermometer icon */}
+                <Image
+                src="/icons/thermometer.svg"
+                alt='Thermometer icon'
+                width={24}
+                height={24}
+                >
+                </Image>
+
+                {/* Temperature value */}
+                <p>Temperature: {weather && weather.main.temp} °F</p>
+
+              </div>
+
+            </div>
+
+            <div className={widgetBoxes}>
+
+              <div className='flex items-center gap-2'>
+
+                {/* Feels like icon */}
+                <Image
+                src="/icons/thermometer.svg"
+                alt='Thermometer icon'
+                width={24}
+                height={24}
+                >
+                </Image>
+
+                {/* Feels like value */}
+                <p>Feels like: {weather && weather.main.feels_like} °F</p>
+
+              </div>
+
+            </div>
+
+            <div className={widgetBoxes}>
+              
+              <div className='flex items-center gap-2'>
+
+                {/* Humid icon */}
+                <Image
+                src="/icons/humid.svg"
+                alt='Humid icon'
+                width={24}
+                height={24}
+                >
+                </Image>
+
+                {/* Humid value */}
+                <p>Humidity: {weather && weather.main.humidity}</p>
+
+
+              </div>
+
+            </div>
+
+            <div className={widgetBoxes}>
+              
+              <div className='flex items-center gap-2'>
+
+                {/* Precipitation icon */}
+                <Image
+                src="/icons/precipitation.svg"
+                alt='Precipitation icon'
+                width={24}
+                height={24}
+                >
+                </Image>
+
+                {/* Precipitation value */}
+                <p>Precipitation: {weather && weather.rain ? weather.rain['1h'] : 0}</p>
+
+
+              </div>
+
+            </div>
+
+            <div className={widgetBoxes}>
+              
+              <div className='flex items-center gap-2'>
+
+                {/* Wind speed icon */}
+                <Image
+                src="/icons/wind.svg"
+                alt='Wind speed icon'
+                width={24}
+                height={24}
+                >
+                </Image>
+
+                {/* Wind speed value */}
+                <p>Wind Speed: {weather && weather.wind.speed}</p>
+
+
+              </div>
+
+            </div>
+
+            <div className={widgetBoxes}>
+              
+              <div className='flex items-center gap-2'>
+
+                {/* UV Index icon */}
+                <Image
+                src="/icons/uv.svg"
+                alt='UV Index icon'
+                width={24}
+                height={24}
+                >
+                </Image>
+
+                {/* UV Index value */}
+                <p>UV Index: {weather && weather.uvIndex}</p>
+
+
+              </div>
+
+            </div>
+
+          </div>
 
         </div>
-
-        <div className='grid grid-cols-3 gap-10'>
-
-          <div className={widgetBoxes}>
-
-            <div className='flex items-center gap-2'>
-
-              {/* Thermometer icon */}
-              <Image
-              src="/icons/thermometer.svg"
-              alt='Thermometer icon'
-              width={24}
-              height={24}
-              >
-              </Image>
-
-              {/* Temperature value */}
-              <p>Temperature: {weather && weather.main.temp} °F</p>
-
-            </div>
-
-          </div>
-
-          <div className={widgetBoxes}>
-
-            <div className='flex items-center gap-2'>
-
-              {/* Feels like icon */}
-              <Image
-              src="/icons/thermometer.svg"
-              alt='Thermometer icon'
-              width={24}
-              height={24}
-              >
-              </Image>
-
-              {/* Feels like value */}
-              <p>Feels like: {weather && weather.main.feels_like} °F</p>
-
-            </div>
-
-          </div>
-
-          <div className={widgetBoxes}>
-            
-            <div className='flex items-center gap-2'>
-
-              {/* Humid icon */}
-              <Image
-              src="/icons/humid.svg"
-              alt='Humid icon'
-              width={24}
-              height={24}
-              >
-              </Image>
-
-              {/* Humid value */}
-              <p>Humidity: {weather && weather.main.humidity}</p>
-
-
-            </div>
-
-          </div>
-
-          <div className={widgetBoxes}>
-            
-            <div className='flex items-center gap-2'>
-
-              {/* Precipitation icon */}
-              <Image
-              src="/icons/precipitation.svg"
-              alt='Precipitation icon'
-              width={24}
-              height={24}
-              >
-              </Image>
-
-              {/* Precipitation value */}
-              <p>Precipitation: {weather && weather.rain ? weather.rain['1h'] : 0}</p>
-
-
-            </div>
-
-          </div>
-
-          <div className={widgetBoxes}>
-            
-            <div className='flex items-center gap-2'>
-
-              {/* Wind speed icon */}
-              <Image
-              src="/icons/wind.svg"
-              alt='Wind speed icon'
-              width={24}
-              height={24}
-              >
-              </Image>
-
-              {/* Wind speed value */}
-              <p>Wind Speed: {weather && weather.wind.speed}</p>
-
-
-            </div>
-
-          </div>
-
-          <div className={widgetBoxes}>
-            
-            <div className='flex items-center gap-2'>
-
-              {/* UV Index icon */}
-              <Image
-              src="/icons/uv.svg"
-              alt='UV Index icon'
-              width={24}
-              height={24}
-              >
-              </Image>
-
-              {/* UV Index value */}
-              <p>UV Index: {weather && weather.uvIndex}</p>
-
-
-            </div>
-
-          </div>
-
-        </div>
-
       </div>
 
     </div>
