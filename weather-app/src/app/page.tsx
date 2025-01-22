@@ -303,7 +303,7 @@ export default function Home() {
 
         {/* Title */}
         <h1 
-          className={`text-black font-bold mb-6 text-5xl cursor-pointer w-[315px] border border-black
+          className={`text-black font-bold mb-6 text-5xl cursor-pointer w-[315px]
                       transition-all duration-1000 ease-in-and-out ${isLocationEntered ? '' : 'mt-[200px]'}`}
           onClick={() => window.location.reload()}>
           Weather App
