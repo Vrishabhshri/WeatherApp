@@ -14,14 +14,14 @@ export default function Home() {
   const [isLocationEntered, setLocationEntered] = useState(false)
   const [suggestions, setSuggestions] = useState<any>([])
   const [recents, setRecents] = useState<any>([]);
-  // const [savedLat, setSavedLat] = useState<number>(0);
-  // const [savedLon, setSavedLon] = useState<number>(0);
+  const [savedLat, setSavedLat] = useState<number>(0);
+  const [savedLon, setSavedLon] = useState<number>(0);
   const [exportFormat, setExportFormat] = useState("json");
 
   // Router and API Keys
   const router = useRouter();
   const OWAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
-  // const GoogleAPIKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+  const GoogleAPIKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 
   // Special widgetboxes tailwind to avoid d.r.y. code
   const widgetBoxes = `border border-2 border-black rounded-lg 
@@ -139,8 +139,8 @@ export default function Home() {
       setSuggestions([]);
 
       // Saved current lat and lon for Google Maps API
-      // setSavedLat(lat);
-      // setSavedLon(lon);
+      setSavedLat(lat);
+      setSavedLon(lon);
 
       // Reloading recents
       getRecents();
@@ -237,43 +237,6 @@ export default function Home() {
     }
 
   } 
-
-  // // Exporting as JSON
-  // const exportJSON = () => {
-
-  //   console.log(weather);
-  //   const json = JSON.stringify(weather, null, 2);
-  //   const blob = new Blob([json], { type: "application/json" })
-  //   const url = URL.createObjectURL(blob);
-
-  //   const a = document.createElement('a');
-  //   a.href = url;
-  //   a.download = "location-data.json";
-  //   a.click();
-  //   URL.revokeObjectURL(url);
-
-  // }
-
-  // // Exporting as PDF
-  // const exportPDF = () => {
-
-  //   const doc = new jsPDF();
-
-  //   doc.setFont("times new roman", "normal");
-  //   doc.setFontSize(12);
-  //   doc.text("Location Data", 10, 10);
-
-  //   let offset = 20;
-  //   for (const key in weather) {
-
-  //     doc.text(`${key.charAt(0).toUpperCase() + key.slice(1)}: ${weather[key]}`, 10, offset);
-  //     offset += 10;
-
-  //   }
-
-  //   doc.save("location-data.pdf");
-
-  // }
 
   // Loading recents upon startup
   useEffect(() => {
@@ -600,7 +563,7 @@ export default function Home() {
         </div>}
 
         {/* Google Map */}
-        {/* {weather && <div className=''>
+        {weather && <div className=''>
 
             <iframe
             title='Google Map'
@@ -613,7 +576,7 @@ export default function Home() {
 
             </iframe>
 
-        </div>} */}
+        </div>}
 
       </div>
 
