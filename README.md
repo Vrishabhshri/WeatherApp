@@ -31,3 +31,9 @@ I created a weather app with two services:
 Notes:
 - Google Maps has been incorporated in the code, but is commented out since I don't want to risk too many calls being made causing
 my card to be charged. If unsure about where it would appear, it would appear in under the recents list, with the recents list being moved up.
+
+How to run:
+- npm install 
+- npm run dev
+- open http://localhost:3000 in your browser
+- most features won't work since they require API access, but link in form should be enough to run it
