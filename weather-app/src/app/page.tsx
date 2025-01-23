@@ -488,10 +488,6 @@ export default function Home() {
               onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}
               >
 
-                {/* <div className='ml-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
-                  <Image src="/icons/update.svg" alt='Update icon' width={16} height={16}/>
-                </div> */}
-
                 <p className='ml-1'>{recent.city}, {recent.country}</p>
 
                 <div className='mr-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
