@@ -553,18 +553,19 @@ export default function History() {
 
     </div>
 
-    <div>
+    {/* Right side of page */}
+    <div className='flex flex-col justify-around ml-12 w-1/6 h-3/4'>
 
       {/* Recents */}
-      <div className={`ml-12 w-1/6 flex flex-col gap-4 max-h-[600px]
-                                              cursor-pointer overflow-y-auto no-scrollbar`}>
+      {recents.length > 0 && <div className={`w-full flex flex-col gap-4 h-1/2
+                                                cursor-pointer overflow-y-auto no-scrollbar`}>
 
           {recents.map((recent, index: number) => (
 
             <div 
             key={index} 
             className='border border-2 border-black rounded-lg
-                        w-full h-12
+                        w-full h-8
                         sm:text-xs md:text-sm lg:text-base xl:text-lg
                         flex items-center justify-between
                         transition-all duration-200
@@ -587,7 +588,7 @@ export default function History() {
 
           ))}
 
-      </div>
+      </div>}
 
       {/* Google Map */}
       {/* {weather && <div className=''>
