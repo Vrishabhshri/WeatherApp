@@ -8,6 +8,7 @@ import Image from 'next/image';
 
 export default function History() {
 
+  // Variables for storing states
   const [location, setLocation] = useState('')
   const [isLocationEntered, setLocationEntered] = useState(false)
   const [startDate, setStartDate] = useState<string>('');
@@ -21,11 +22,13 @@ export default function History() {
   const [savedLat, setSavedLat] = useState<number>(0);
   const [savedLon, setSavedLon] = useState<number>(0);
 
+  // Router and API Keys
   const router = useRouter();
   const OPENWEATHERAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
   const VCAPIKey = process.env.NEXT_PUBLIC_VC_API_KEY;
   const VCBASE_URL = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline`;
 
+  // Special widgetboxes tailwind to avoid d.r.y. code
   const widgetBoxes = `border border-2 border-black rounded-lg 
                       w-full sm:w-40 md:w-44 lg:w-48 xl:w-52 h-24
                       sm:text-xs md:text-sm lg:text-base xl:text-lg
@@ -33,6 +36,7 @@ export default function History() {
                       transition-all duration-200
                       hover:bg-gray-400 hover:scale-105`;
 
+  // Changing input bar every time user inputs or delets number                  
   const handleInputBarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const input = e.target.value;
@@ -40,6 +44,7 @@ export default function History() {
 
   }
 
+  // Changing start date bar every time user inputs or delets number
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const input = e.target.value;
@@ -47,6 +52,7 @@ export default function History() {
 
   }
   
+  // Changing start date bar every time user inputs or delets number
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const input = e.target.value;
@@ -56,10 +62,11 @@ export default function History() {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
-    if (e.key === 'Enter') handleSearch(location);
+    if (e.key === 'Enter') handleSearch(location, startDate, endDate);
 
   }
 
+  // Ensuring date range is within given amount (length)
   const handleDateCheck = (startDate: Date, endDate: Date, length: number) => {
 
     const timeDifference = endDate.getTime() - startDate.getTime();
@@ -72,16 +79,19 @@ export default function History() {
 
   }
 
+  // Handling search call to find weather info
   const handleSearch = async (clickedLocation: any, startDate: string, endDate: string) => {
 
     let selectedLocation;
 
+    // Location has been clicked from suggestions list
     if (typeof clickedLocation !== "string") {
 
       selectedLocation = `${clickedLocation.lat},${clickedLocation.lon}`;
       setLocation(clickedLocation.name + ', ' + clickedLocation.state + ', ' + clickedLocation.country);
 
     }
+    // Location was entered
     else {
 
       const slArr = clickedLocation.split(',')
@@ -97,6 +107,7 @@ export default function History() {
 
     }
 
+    // Check if valid end date and start date was given
     if (isNaN(new Date(endDate).getTime()) || isNaN(new Date(startDate).getTime())) {
 
       alert('Please enter valid start and end date');
@@ -110,6 +121,7 @@ export default function History() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Check that end date doesn't exceed today's date
     if (endDateObject > today) {
 
       alert('Please enter an end date that is no later than today');
@@ -117,6 +129,7 @@ export default function History() {
 
     }
 
+    // Check start date doesn't exceed end date
     if (startDateObject > endDateObject) {
 
       alert('Please enter a date range with a start date less then end date');
@@ -124,6 +137,7 @@ export default function History() {
 
     }
 
+    // Check different between start and end date isn't greater than 7
     if (handleDateCheck(startDateObject, endDateObject, 7)) {
 
       alert('Please enter a date range no longer than 7 days');
@@ -131,6 +145,7 @@ export default function History() {
 
     }
 
+    // Check difference between start date and today's date isn't greater than 16
     if (handleDateCheck(startDateObject, today, 16)) {
 
       alert('Please enter a start date less than 16 days ago');
@@ -164,10 +179,12 @@ export default function History() {
       // Fetching lat and lon based on input given
       const weatherResponse = await axios.get('https://api.openweathermap.org/data/2.5/weather', { params });
       const { lat, lon } = weatherResponse.data.coord;
+
+      // Finding location name from lat and lon to store in db in case coordinates or zipcode were given
       const locationResponse = await axios.get(`http://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=${1}&appid=${OPENWEATHERAPIKey}`);
       const newLocationName = locationResponse.data[0].name + ", " + locationResponse.data[0].country
-      console.log(locationResponse.data[0]);
 
+      // Calling seperate function to handle getting weather data after all edge cases have been passed
       getWeatherData(lat, lon, newLocationName, startDate, endDate);
       
       // Notifying that a location has been entered
@@ -183,8 +200,10 @@ export default function History() {
 
   }
 
+  // Finding weather information
   async function getWeatherData(lat: number, lon: number, location: string, startDate: string, endDate: string) {
 
+    // Creating url to search for weather data
     const url = `${VCBASE_URL}/${lat},${lon}/${startDate}/${endDate}?key=${VCAPIKey}`;
     
     try {
@@ -192,6 +211,7 @@ export default function History() {
       const response = await fetch(url);
       const data = await response.json();
 
+      // If data.days exists, the valid data has been received
       if (data && data.days) {
 
         // Set weather list to the temperature for the date range
@@ -231,6 +251,7 @@ export default function History() {
 
   }
 
+  // Finding user location if permission given
   const getUserLocation = () => {
 
     if (navigator.geolocation) {
@@ -248,6 +269,7 @@ export default function History() {
 
   }
 
+  // Loading recents from db
   const getRecents = async () => {
 
     try {
@@ -326,6 +348,7 @@ export default function History() {
 
   }
 
+  // Handling a delete location from pressing x in recent location box
   const deleteLocation = (id: number) => {
 
     axios.delete('/api/daterangeLocations', {
@@ -338,6 +361,7 @@ export default function History() {
 
   }
 
+  // Loading recents upon startup
   useEffect(() => {
 
     getRecents();
@@ -353,6 +377,8 @@ export default function History() {
                     overflow-hidden
                     ${weatherList !== null ? '' : ''}
                     `}>
+
+      {/* Left side of page */}
       <div>
 
         <div className='flex flex-row items-center'>
@@ -375,11 +401,12 @@ export default function History() {
 
         </div>
 
-        {/* Input bar and button */}
+        {/* Input bar and buttons */}
         <div className={`flex gap-2 transition-all duration-1000 ease-in-and-out`}>
 
           <div className='flex flex-col'>
 
+            {/* Location input */}
             <input
               type="text"
               placeholder="Enter current location"
@@ -391,6 +418,7 @@ export default function History() {
 
             <div className='flex flex-row'>
 
+              {/* Start date */}
               <input
                 type="date"
                 className="w-50 border-2 border-black rounded-full px-4 py-1 focus:outline-none"
@@ -398,6 +426,7 @@ export default function History() {
                 onChange={handleStartDateChange}
               />
 
+              {/* End date */}
               <input
                 type="date"
                 className="w-50 border-2 border-black rounded-full px-4 py-1 focus:outline-none"
@@ -436,6 +465,7 @@ export default function History() {
         {/* Showing weather location when location has been entered */}
         <div className={`transition-all duration-1000 ease-in-and-out ${(isLocationEntered && weatherList) ? '' : 'translate-y-[1000px]'}`}>
 
+          {/* 5-day forecast */}
           <div className='border border-2 border-black rounded-lg
                           h-24
                           mb-4

@@ -8,6 +8,7 @@ import { calcIconFromCondition, isZipCode, isCoords } from '@/utils/pageFunction
 
 export default function Home() {
 
+  // Variables for storing states
   const [weather, setWeather] = useState<any>(null)
   const [location, setLocation] = useState('')
   const [isLocationEntered, setLocationEntered] = useState(false)
@@ -16,9 +17,12 @@ export default function Home() {
   const [savedLat, setSavedLat] = useState<number>(0);
   const [savedLon, setSavedLon] = useState<number>(0);
 
+  // Router and API Keys
   const router = useRouter();
   const OWAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
   const GoogleAPIKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+
+  // Special widgetboxes tailwind to avoid d.r.y. code
   const widgetBoxes = `border border-2 border-black rounded-lg 
                       w-full sm:w-40 md:w-44 lg:w-48 xl:w-52 h-24
                       sm:text-xs md:text-sm lg:text-base xl:text-lg
@@ -26,6 +30,7 @@ export default function Home() {
                       transition-all duration-200
                       hover:bg-gray-400 hover:scale-105`;
 
+  // Changing input bar every time user inputs or delets number, also loading suggestions based on user input so far
   const handleInputBarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const input = e.target.value;
@@ -50,16 +55,19 @@ export default function Home() {
 
   }
 
+  // Handling search call to find weather info
   const handleSearch = async (clickedLocation?: any) => {
 
     let selectedLocation;
 
+    // Location has been clicked from suggestions list
     if (typeof clickedLocation !== "string") {
 
       selectedLocation = `${clickedLocation.lat},${clickedLocation.lon}`;
       setLocation(clickedLocation.name + ', ' + clickedLocation.state + ', ' + clickedLocation.country);
 
     }
+    // Location was entered
     else {
 
       const slArr = clickedLocation.split(',')
@@ -101,12 +109,16 @@ export default function Home() {
       // Fetching weather, forecast, and uv index
       const weatherResponse = await axios.get('https://api.openweathermap.org/data/2.5/weather', { params });
       const { lat, lon } = weatherResponse.data.coord;
-      const uvResponse = await axios.get(`https://api.openweathermap.org/data/2.5/uvi?appid=${OWAPIKey}&lat=${lat}&lon=${lon}`);
-      const forecastResponse = await axios.get('https://api.openweathermap.org/data/2.5/forecast', { params });
 
+      // Seperate call to find UV Index from different URL
+      const uvResponse = await axios.get(`https://api.openweathermap.org/data/2.5/uvi?appid=${OWAPIKey}&lat=${lat}&lon=${lon}`);
+
+      // Calls to find 5-day forecast
+      const forecastResponse = await axios.get('https://api.openweathermap.org/data/2.5/forecast', { params });
       const forecastList = forecastResponse.data.list;
       const dailyForecast = forecastList.filter((item: any, index: number) => index % 8 === 0)
 
+      // Calling post to add current location to db
       await axios.post('/api/recentLocations', {
         city: weatherResponse.data.name,
         country: weatherResponse.data.sys.country,
@@ -120,8 +132,12 @@ export default function Home() {
       setLocationEntered(true);
       // Clearing suggestions once a location has been selected
       setSuggestions([]);
+
+      // Saved current lat and lon for Google Maps API
       setSavedLat(lat);
       setSavedLon(lon);
+
+      // Reloading recents
       getRecents();
 
     }
@@ -140,6 +156,7 @@ export default function Home() {
 
   }
 
+  // Handling a delete location from pressing x in recent location box
   const deleteLocation = (id: number) => {
 
     axios.delete('/api/recentLocations', {
@@ -152,6 +169,7 @@ export default function Home() {
 
   }
 
+  // Loading recents from db
   const getRecents = async () => {
 
     try {
@@ -172,6 +190,7 @@ export default function Home() {
 
   }
 
+  // Finding user location if permission given
   const getUserLocation = () => {
 
     if (navigator.geolocation) {
@@ -189,6 +208,7 @@ export default function Home() {
 
   }
 
+  // Calculating background from condition given by weather API of current location
   const calcBackgroundColorFromCondition = (condition: string) => {
 
     switch (condition) {
@@ -206,6 +226,7 @@ export default function Home() {
 
   } 
 
+  // Loading recents upon startup
   useEffect(() => {
 
     getRecents();
@@ -250,6 +271,7 @@ export default function Home() {
 
           <div className='flex flex-col'>
 
+            {/* Location input */}
             <input
               type="text"
               placeholder="Enter current location"
@@ -308,6 +330,7 @@ export default function Home() {
         {/* Showing weather location when location has been entered */}
         <div className={`transition-all duration-1000 ease-in-and-out ${(isLocationEntered && weather) ? '' : 'translate-y-[1000px]'}`}>
 
+          {/* 5-day forecast */}
           <div className='border border-2 border-black rounded-lg
                           h-24
                           mb-4
