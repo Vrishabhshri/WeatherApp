@@ -182,9 +182,10 @@ export default function History() {
       const { lat, lon } = weatherResponse.data.coord;
 
       // Finding location name from lat and lon to store in db in case coordinates or zipcode were given
-      const locationResponse = await axios.get('https://api.openweathermap.org/data/2.5/weather', {
-        params: { lat, lon, appid: OPENWEATHERAPIKey, units: 'imperial' },
+      const locationResponse = await axios.get('https://api.openweathermap.org/geo/1.0/reverse', {
+        params: { lat, lon, appid: OPENWEATHERAPIKey, limit: 1 },
       });
+      console.log(locationResponse.data);
       const newLocationName = locationResponse.data[0].name + ", " + locationResponse.data[0].country
 
       // Calling seperate function to handle getting weather data after all edge cases have been passed
