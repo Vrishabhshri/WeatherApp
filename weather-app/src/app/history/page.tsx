@@ -660,7 +660,7 @@ export default function History() {
       </div>}
 
       {/* Google Map */}
-      {weather && <div className=''>
+      {weatherList && <div className=''>
 
           <iframe
           title='Google Map'
