@@ -19,8 +19,8 @@ export default function History() {
   const [highPrec, setHighPrec] = useState(0);
   const [avgFeelsLike, setAvgFeelsLike] = useState(0);
   const [recents, setRecents] = useState<any>([]);
-  const [savedLat, setSavedLat] = useState<number>(0);
-  const [savedLon, setSavedLon] = useState<number>(0);
+  // const [savedLat, setSavedLat] = useState<number>(0);
+  // const [savedLon, setSavedLon] = useState<number>(0);
   const [exportFormat, setExportFormat] = useState("json");
 
   // Router and API Keys
@@ -28,7 +28,7 @@ export default function History() {
   const OPENWEATHERAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
   const VCAPIKey = process.env.NEXT_PUBLIC_VC_API_KEY;
   const VCBASE_URL = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline`;
-  const GoogleAPIKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+  // const GoogleAPIKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 
   // Special widgetboxes tailwind to avoid d.r.y. code
   const widgetBoxes = `border border-2 border-black rounded-lg 
@@ -249,8 +249,8 @@ export default function History() {
         getRecents();
 
         // Save lat and lon coords for google map use
-        setSavedLat(lat);
-        setSavedLon(lon);
+        // setSavedLat(lat);
+        // setSavedLon(lon);
 
       }
 
@@ -660,7 +660,7 @@ export default function History() {
       </div>}
 
       {/* Google Map */}
-      {weatherList && <div className=''>
+      {/* {weatherList && <div className=''>
 
           <iframe
           title='Google Map'
@@ -673,7 +673,7 @@ export default function History() {
 
           </iframe>
 
-      </div>}
+      </div>} */}
 
     </div>
 

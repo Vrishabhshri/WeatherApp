@@ -14,14 +14,14 @@ export default function Home() {
   const [isLocationEntered, setLocationEntered] = useState(false)
   const [suggestions, setSuggestions] = useState<any>([])
   const [recents, setRecents] = useState<any>([]);
-  const [savedLat, setSavedLat] = useState<number>(0);
-  const [savedLon, setSavedLon] = useState<number>(0);
+  // const [savedLat, setSavedLat] = useState<number>(0);
+  // const [savedLon, setSavedLon] = useState<number>(0);
   const [exportFormat, setExportFormat] = useState("json");
 
   // Router and API Keys
   const router = useRouter();
   const OWAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
-  const GoogleAPIKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+  // const GoogleAPIKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 
   // Special widgetboxes tailwind to avoid d.r.y. code
   const widgetBoxes = `border border-2 border-black rounded-lg 
@@ -139,8 +139,8 @@ export default function Home() {
       setSuggestions([]);
 
       // Saved current lat and lon for Google Maps API
-      setSavedLat(lat);
-      setSavedLon(lon);
+      // setSavedLat(lat);
+      // setSavedLon(lon);
 
       // Reloading recents
       getRecents();
@@ -563,7 +563,7 @@ export default function Home() {
         </div>}
 
         {/* Google Map */}
-        {weather && <div className=''>
+        {/* {weather && <div className=''>
 
             <iframe
             title='Google Map'
@@ -576,7 +576,7 @@ export default function Home() {
 
             </iframe>
 
-        </div>}
+        </div>} */}
 
       </div>
 
