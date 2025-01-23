@@ -6,10 +6,10 @@ export async function POST(req) {
 
     try {
 
-        const { days, lat, lon, startDate, endDate } = await req.json();
+        const { days, lat, lon, location, startDate, endDate } = await req.json();
         await connectMongoDB();
 
-        await DaterangeLocation.create({ days, lat, lon, startDate, endDate })
+        await DaterangeLocation.create({ days, lat, lon, location, startDate, endDate })
         return NextResponse.json({ message: "Location created" }, { status: 200 });
 
     }

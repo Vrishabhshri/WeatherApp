@@ -4,7 +4,10 @@ const daterangeLocationSchema = new mongoose.Schema(
     {
         days: [],
         lat: Number,
-        lon: Number
+        lon: Number,
+        location: String,
+        startDate: String,
+        endDate: String
     },
     {
         timestamps: true

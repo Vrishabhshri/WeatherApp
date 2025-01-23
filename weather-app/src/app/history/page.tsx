@@ -70,7 +70,7 @@ export default function History() {
 
   }
 
-  const handleSearch = async (clickedLocation?: any) => {
+  const handleSearch = async (clickedLocation: any, startDate: string, endDate: string) => {
 
     let selectedLocation;
 
@@ -162,14 +162,14 @@ export default function History() {
       // Fetching lat and lon based on input given
       const weatherResponse = await axios.get('https://api.openweathermap.org/data/2.5/weather', { params });
       const { lat, lon } = weatherResponse.data.coord;
+      const locationResponse = await axios.get(`http://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=${1}&appid=${OPENWEATHERAPIKey}`);
+      const newLocationName = locationResponse.data[0].name + ", " + locationResponse.data[0].country
+      console.log(locationResponse.data[0]);
 
-      getWeatherData(lat, lon);
+      getWeatherData(lat, lon, newLocationName, startDate, endDate);
       
       // Notifying that a location has been entered
       setLocationEntered(true)
-      // Clearing suggestions once a location has been selected
-      // getRecents();
-      // console.log(recents);
 
     }
     catch(error) {
@@ -181,7 +181,7 @@ export default function History() {
 
   }
 
-  async function getWeatherData(lat:number, lon:number) {
+  async function getWeatherData(lat: number, lon: number, location: string, startDate: string, endDate: string) {
 
     const url = `${VCBASE_URL}/${lat},${lon}/${startDate}/${endDate}?key=${VCAPIKey}`;
     
@@ -192,21 +192,26 @@ export default function History() {
 
       if (data && data.days) {
 
-        console.log(data.days);
+        // Set weather list to the temperature for the date range
         setWeatherList(data.days);
+
+        // Update important info to populate widgets
         calcHighTemp(data.days);
         calcLowTemp(data.days);
         calcAverageFeelsLike(data.days);
         calcHighPrec(data.days);
 
+        // Add current date range weather query to database
         await axios.post('/api/daterangeLocations', {
           days: data.days,
           lat: lat,
           lon: lon,
+          location: location,
           startDate: startDate,
           endDate: endDate
         });
 
+        // Reload recents once a successful query has been made
         getRecents();
 
       }
@@ -228,7 +233,7 @@ export default function History() {
 
         const { latitude, longitude } = position.coords
 
-        handleSearch(latitude + "," + longitude);
+        handleSearch(latitude + "," + longitude, startDate, endDate);
         setLocation(latitude + "," + longitude);
 
       })
@@ -315,6 +320,18 @@ export default function History() {
 
   }
 
+  const deleteLocation = (id: number) => {
+
+    axios.delete('/api/daterangeLocations', {
+      params: {
+        id: id
+      }
+    });
+
+    setTimeout(() => getRecents(), 50);
+
+  }
+
   useEffect(() => {
 
     getRecents();
@@ -389,7 +406,7 @@ export default function History() {
           {/* Search button */}
           <button 
             className="px-4 py-1 bg-yellow-600 rounded-full h-[40px]"
-            onClick={() => handleSearch(location)}
+            onClick={() => handleSearch(location, startDate, endDate)}
           >
             <Image
               src="/icons/search-icon-button.png"
@@ -415,7 +432,6 @@ export default function History() {
 
           <div className='border border-2 border-black rounded-lg
                           h-24
-                          w-[600px]
                           mb-4
                           mt-24
                           flex flex-row items-center justify-center
@@ -441,7 +457,7 @@ export default function History() {
 
           </div>
 
-          <div className='grid grid-cols-3 gap-4 w-[600px]'>
+          <div className='grid grid-cols-3 gap-4'>
 
             <div className={widgetBoxes}>
 
@@ -533,7 +549,7 @@ export default function History() {
 
     {/* Recents */}
     <div className={`ml-12 w-1/6 flex flex-col gap-4 max-h-[600px]
-                                            cursor-pointer overflow-y-auto no-scrollbar border border-black`}>
+                                            cursor-pointer overflow-y-auto no-scrollbar`}>
 
         {recents.map((recent, index: number) => (
 
@@ -545,14 +561,19 @@ export default function History() {
                       flex items-center justify-between
                       transition-all duration-200
                       hover:bg-gray-400' 
-          onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}
+          onClick={() => {
+            handleSearch(recent.lat + "," + recent.lon, recent.startDate, recent.endDate); 
+            setLocation(recent.lat + "," + recent.lon);
+            setStartDate(recent.startDate);
+            setEndDate(recent.endDate);
+          }}
           >
 
-            {recent.city}, {recent.country}
+            {recent.location}
 
-            {/* <div className='mr-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
+            <div className='mr-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
               <Image src="/icons/x.svg" alt='Delete icon' width={12} height={12}/>
-            </div> */}
+            </div>
 
           </div>
 
