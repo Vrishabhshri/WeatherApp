@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { calcBackgroundColorFromCondition, calcIconFromCondition, isZipCode, isCoords } from '@/utils/pageFunctions';
+import { calcIconFromCondition, isZipCode, isCoords, exportJSON, exportPDF } from '@/utils/pageFunctions';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Image from 'next/image';
@@ -21,6 +21,7 @@ export default function History() {
   const [recents, setRecents] = useState<any>([]);
   const [savedLat, setSavedLat] = useState<number>(0);
   const [savedLon, setSavedLon] = useState<number>(0);
+  const [exportFormat, setExportFormat] = useState("json");
 
   // Router and API Keys
   const router = useRouter();
@@ -197,6 +198,14 @@ export default function History() {
       console.error(error);
 
     }
+
+  }
+
+  // Handling which type of export
+  const handleExport = () => {
+
+    if (exportFormat === "json") weatherList.forEach(weather => { exportJSON(weather) });
+    else weatherList.forEach(weather => { exportPDF(weather) });
 
   }
 
@@ -459,6 +468,33 @@ export default function History() {
             My location
 
           </button>
+
+          {/* Export button */}
+          {isLocationEntered && (
+            <div className='flex flex-row space-x-2'>
+
+              <select
+                className='px-2 py-1 border-2 border-yellow-600 rounded-md bg-yellow-600 h-[40px]'
+                onChange={(e) => setExportFormat(e.target.value)}
+                defaultValue="json"
+              >
+                <option value="json">Export as JSON</option>
+                <option value="pdf">Export as PDF</option>
+
+              </select>
+
+              <button 
+                className={`px-4 py-1 bg-yellow-600 rounded-full h-[40px]
+                          transition-all duration-1000`}
+                onClick={handleExport}
+              >
+                Export
+
+              </button>
+
+            </div>
+
+          )}
 
         </div>
 

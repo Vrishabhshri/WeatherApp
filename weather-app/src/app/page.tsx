@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { calcIconFromCondition, isZipCode, isCoords } from '@/utils/pageFunctions';
+import { calcIconFromCondition, isZipCode, isCoords, exportJSON, exportPDF } from '@/utils/pageFunctions';
 
 export default function Home() {
 
@@ -16,6 +16,7 @@ export default function Home() {
   const [recents, setRecents] = useState<any>([]);
   const [savedLat, setSavedLat] = useState<number>(0);
   const [savedLon, setSavedLon] = useState<number>(0);
+  const [exportFormat, setExportFormat] = useState("json");
 
   // Router and API Keys
   const router = useRouter();
@@ -156,6 +157,13 @@ export default function Home() {
 
   }
 
+  const handleExport = () => {
+
+    if (exportFormat === "json") exportJSON(weather);
+    else exportPDF(weather);
+
+  }
+
   // Handling a delete location from pressing x in recent location box
   const deleteLocation = (id: number) => {
 
@@ -225,6 +233,43 @@ export default function Home() {
     }
 
   } 
+
+  // // Exporting as JSON
+  // const exportJSON = () => {
+
+  //   console.log(weather);
+  //   const json = JSON.stringify(weather, null, 2);
+  //   const blob = new Blob([json], { type: "application/json" })
+  //   const url = URL.createObjectURL(blob);
+
+  //   const a = document.createElement('a');
+  //   a.href = url;
+  //   a.download = "location-data.json";
+  //   a.click();
+  //   URL.revokeObjectURL(url);
+
+  // }
+
+  // // Exporting as PDF
+  // const exportPDF = () => {
+
+  //   const doc = new jsPDF();
+
+  //   doc.setFont("times new roman", "normal");
+  //   doc.setFontSize(12);
+  //   doc.text("Location Data", 10, 10);
+
+  //   let offset = 20;
+  //   for (const key in weather) {
+
+  //     doc.text(`${key.charAt(0).toUpperCase() + key.slice(1)}: ${weather[key]}`, 10, offset);
+  //     offset += 10;
+
+  //   }
+
+  //   doc.save("location-data.pdf");
+
+  // }
 
   // Loading recents upon startup
   useEffect(() => {
@@ -324,6 +369,33 @@ export default function Home() {
             My location
 
           </button>
+
+          {/* Export button */}
+          {isLocationEntered && (
+            <div className='flex flex-row items-center space-x-2'>
+
+              <select
+                className='px-2 py-1 border-2 border-yellow-600 rounded-md bg-yellow-600'
+                onChange={(e) => setExportFormat(e.target.value)}
+                defaultValue="json"
+              >
+                <option value="json">Export as JSON</option>
+                <option value="pdf">Export as PDF</option>
+
+              </select>
+
+              <button 
+                className={`px-4 py-1 bg-yellow-600 rounded-full h-[40px]
+                          transition-all duration-1000`}
+                onClick={handleExport}
+              >
+                Export
+
+              </button>
+
+            </div>
+            
+          )}
 
         </div>
 

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { jsPDF } from "jspdf";
 
 const calcIconFromCondition = (condition: string) => {
 
@@ -86,7 +87,44 @@ const calcIconFromCondition = (condition: string) => {
 
 }
 
+// Exporting as JSON
+const exportJSON = (data) => {
+
+    console.log(data);
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: "application/json" })
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "location-data.json";
+    a.click();
+    URL.revokeObjectURL(url);
+
+}
+
+// Exporting as PDF
+const exportPDF = (data) => {
+
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text("Location Data", 10, 10);
+
+    let offset = 20;
+    for (const key in data) {
+
+        doc.text(`${key.charAt(0).toUpperCase() + key.slice(1)}: ${data[key]}`, 10, offset);
+        offset += 10;
+
+    }
+
+    doc.save("location-data.pdf");
+
+}
+
 const isZipCode = (str: string) => /^\d{5}(-\d{4})?$/.test(str);
 const isCoords = (str: string) => /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(str);
 
-export { calcIconFromCondition, isZipCode, isCoords };
+export { calcIconFromCondition, isZipCode, isCoords, exportJSON, exportPDF };
