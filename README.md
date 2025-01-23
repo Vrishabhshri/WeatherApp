@@ -2,14 +2,24 @@
 
 Behind the intuition:
 
-I created a weather app that utilizes two different APIs for different types of services. The main "Weather App" allows users to 
-search for the current weather in a specified location. The input takes Zip Code, GPS Coordinates, and Town/City names. It also
-allows users to select "My Location" to see the weather in their current location. Then the recents list populates on the right side 
-of the page allowing users to delete recents or check their recents. Useful weather information will be shown along with a 5-day forecast.
-The database used is MongoDB and is not on a per user basis.
+I created a weather app with two services:
 
-Then, the "History" text can be clicked to take users to a different page that now allows users to enter a date range. Since free API's
-were limited, users can only check for weather information in a specific location in a range of 7 days. The start date can't be farther than
-16 days ago and the end date can't be lated than today. The recents list also populates similarly, now with the date range being shown as well.
-Rather than an update feature, I allow the users to click on a recent location they want and populate the respective fields allowing users
-to change the date range or location, but this new search stores as a new recent search.
+1. Weather App
+- allows users to search for current weather in specified location
+- input tpes include Zip Code, GPS Coordinates, Town/City names
+- allows "My Location" for weather in current location
+- recents list on right controlled through MongoDB
+    - location is created in recent list once user searches location
+    - location is read once clicked on
+    - update can be done by clicking on recent and editing through input fields, however, update will not directly apply to 
+    location clicked and instead will make a new recent since this seemed like the better implementation
+    - deletion through x marker
+- weather info includes useful information about the weather that seems important to every day users and shows 5-day forecast
+
+2. Weather History
+- allows users to search for current weather in specified location, with given range
+- since I had to make use of free API's the range follows these constraints
+    - range only allows for start date no longer than 16 days ago and end date no later than today
+    - range only goes for 7 days
+- recents list similar to Weather App
+- weather info now tries to incorporate useful information from summary of all days that users can interpret
