@@ -44,7 +44,9 @@ export default function Home() {
 
     try {
 
-      const response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=3&appid=${OWAPIKey}`);
+      const response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct`, {
+        params: { q: input, limit: 3, appid: OWAPIKey }
+      });
       setSuggestions(response.data)
 
     }
@@ -112,7 +114,9 @@ export default function Home() {
       const { lat, lon } = weatherResponse.data.coord;
 
       // Seperate call to find UV Index from different URL
-      const uvResponse = await axios.get(`https://api.openweathermap.org/data/2.5/uvi?appid=${OWAPIKey}&lat=${lat}&lon=${lon}`);
+      const uvResponse = await axios.get(`https://api.openweathermap.org/data/2.5/uvi`, {
+        params: { lat, lon, appid: OWAPIKey }
+      });
 
       // Calls to find 5-day forecast
       const forecastResponse = await axios.get('https://api.openweathermap.org/data/2.5/forecast', { params });
