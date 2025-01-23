@@ -19,8 +19,8 @@ export default function History() {
   const [highPrec, setHighPrec] = useState(0);
   const [avgFeelsLike, setAvgFeelsLike] = useState(0);
   const [recents, setRecents] = useState<any>([]);
-  const [savedLat, setSavedLat] = useState<number>(0);
-  const [savedLon, setSavedLon] = useState<number>(0);
+  // const [savedLat, setSavedLat] = useState<number>(0);
+  // const [savedLon, setSavedLon] = useState<number>(0);
   const [exportFormat, setExportFormat] = useState("json");
 
   // Router and API Keys
@@ -204,8 +204,8 @@ export default function History() {
   // Handling which type of export
   const handleExport = () => {
 
-    if (exportFormat === "json") weatherList.forEach(weather => { exportJSON(weather) });
-    else weatherList.forEach(weather => { exportPDF(weather) });
+    if (exportFormat === "json") weatherList.forEach((weather: any) => { exportJSON(weather) });
+    else weatherList.forEach((weather: any) => { exportPDF(weather) });
 
   }
 
@@ -246,8 +246,8 @@ export default function History() {
         getRecents();
 
         // Save lat and lon coords for google map use
-        setSavedLat(lat);
-        setSavedLon(lon);
+        // setSavedLat(lat);
+        // setSavedLon(lon);
 
       }
 
@@ -299,11 +299,11 @@ export default function History() {
 
   }
 
-  const calcHighTemp = (arr) => {
+  const calcHighTemp = (arr: any) => {
 
     let highest = 0;
 
-    arr.forEach(day => {
+    arr.forEach((day: any) => {
 
       highest = Math.max(highest, day.temp);
       
@@ -313,11 +313,11 @@ export default function History() {
 
   }
 
-  const calcLowTemp = (arr) => {
+  const calcLowTemp = (arr: any) => {
 
     let lowest = 200;
 
-    arr.forEach(day => {
+    arr.forEach((day: any) => {
 
       lowest = Math.min(lowest, day.temp);
       
@@ -327,12 +327,12 @@ export default function History() {
 
   }
 
-  const calcAverageFeelsLike = (arr) => {
+  const calcAverageFeelsLike = (arr: any) => {
 
     let total = 0;
     let count = 0;
 
-    arr.forEach(day => {
+    arr.forEach((day: any) => {
 
       total += day.feelslike;
       count++;
@@ -343,11 +343,11 @@ export default function History() {
 
   }
 
-  const calcHighPrec = (arr) => {
+  const calcHighPrec = (arr: any) => {
 
     let highest = 0;
 
-    arr.forEach(day => {
+    arr.forEach((day: any) => {
 
       highest = Math.max(highest, day.precip);
       
@@ -509,7 +509,7 @@ export default function History() {
                           flex flex-row items-center justify-center
                           gap-2'>
 
-            {weatherList && weatherList.map((day, index: number) => {
+            {weatherList && weatherList.map((day: any, index: number) => {
 
               const date = day.datetime;
 
@@ -626,7 +626,7 @@ export default function History() {
       {recents.length > 0 && <div className={`w-full flex flex-col gap-4 h-1/2
                                                 cursor-pointer overflow-y-auto no-scrollbar`}>
 
-          {recents.map((recent, index: number) => (
+          {recents.map((recent: any, index: number) => (
 
             <div 
             key={index} 

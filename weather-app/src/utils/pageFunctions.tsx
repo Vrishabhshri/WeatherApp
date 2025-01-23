@@ -88,7 +88,7 @@ const calcIconFromCondition = (condition: string) => {
 }
 
 // Exporting as JSON
-const exportJSON = (data) => {
+const exportJSON = (data: any) => {
 
     console.log(data);
     const json = JSON.stringify(data, null, 2);
@@ -104,7 +104,7 @@ const exportJSON = (data) => {
 }
 
 // Exporting as PDF
-const exportPDF = (data) => {
+const exportPDF = (data: any) => {
 
     const doc = new jsPDF();
 
