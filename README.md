@@ -15,6 +15,7 @@ I created a weather app with two services:
     location clicked and instead will make a new recent since this seemed like the better implementation
     - deletion through x marker
 - weather info includes useful information about the weather that seems important to every day users and shows 5-day forecast
+- background color adjusts to reflect mood of current condition
 
 2. Weather History
 - allows users to search for current weather in specified location, with given range
@@ -23,3 +24,8 @@ I created a weather app with two services:
     - range only goes for 7 days
 - recents list similar to Weather App
 - weather info now tries to incorporate useful information from summary of all days that users can interpret
+- background color doesn't change since many conditions can be relevant
+
+Notes:
+- Google Maps has been incorporated in the code, but is commented out since I don't want to risk too many calls being made causing
+my card to be charged. If unsure about where it would appear, it would appear in under the recents list, with the recents list being moved up.

@@ -18,6 +18,8 @@ export default function History() {
   const [highPrec, setHighPrec] = useState(0);
   const [avgFeelsLike, setAvgFeelsLike] = useState(0);
   const [recents, setRecents] = useState<any>([]);
+  const [savedLat, setSavedLat] = useState<number>(0);
+  const [savedLon, setSavedLon] = useState<number>(0);
 
   const router = useRouter();
   const OPENWEATHERAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
@@ -213,6 +215,10 @@ export default function History() {
 
         // Reload recents once a successful query has been made
         getRecents();
+
+        // Save lat and lon coords for google map use
+        setSavedLat(lat);
+        setSavedLon(lon);
 
       }
 
@@ -547,37 +553,57 @@ export default function History() {
 
     </div>
 
-    {/* Recents */}
-    <div className={`ml-12 w-1/6 flex flex-col gap-4 max-h-[600px]
-                                            cursor-pointer overflow-y-auto no-scrollbar`}>
+    <div>
 
-        {recents.map((recent, index: number) => (
+      {/* Recents */}
+      <div className={`ml-12 w-1/6 flex flex-col gap-4 max-h-[600px]
+                                              cursor-pointer overflow-y-auto no-scrollbar`}>
 
-          <div 
-          key={index} 
-          className='border border-2 border-black rounded-lg
-                      w-full h-12
-                      sm:text-xs md:text-sm lg:text-base xl:text-lg
-                      flex items-center justify-between
-                      transition-all duration-200
-                      hover:bg-gray-400' 
-          onClick={() => {
-            handleSearch(recent.lat + "," + recent.lon, recent.startDate, recent.endDate); 
-            setLocation(recent.lat + "," + recent.lon);
-            setStartDate(recent.startDate);
-            setEndDate(recent.endDate);
-          }}
-          >
+          {recents.map((recent, index: number) => (
 
-            {recent.location}
+            <div 
+            key={index} 
+            className='border border-2 border-black rounded-lg
+                        w-full h-12
+                        sm:text-xs md:text-sm lg:text-base xl:text-lg
+                        flex items-center justify-between
+                        transition-all duration-200
+                        hover:bg-gray-400' 
+            onClick={() => {
+              handleSearch(recent.lat + "," + recent.lon, recent.startDate, recent.endDate); 
+              setLocation(recent.lat + "," + recent.lon);
+              setStartDate(recent.startDate);
+              setEndDate(recent.endDate);
+            }}
+            >
 
-            <div className='mr-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
-              <Image src="/icons/x.svg" alt='Delete icon' width={12} height={12}/>
+              {recent.location}
+
+              <div className='mr-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
+                <Image src="/icons/x.svg" alt='Delete icon' width={12} height={12}/>
+              </div>
+
             </div>
 
-          </div>
+          ))}
 
-        ))}
+      </div>
+
+      {/* Google Map */}
+      {/* {weather && <div className=''>
+
+          <iframe
+          title='Google Map'
+          src={`https://www.google.com/maps/embed/v1/view?key=${GoogleAPIKey}&center=${savedLat},${savedLon}&zoom=12`}
+          width="100%"
+          height="100%"
+          style={{border: 0}}
+          loading='lazy'
+          >
+
+          </iframe>
+
+      </div>} */}
 
     </div>
 

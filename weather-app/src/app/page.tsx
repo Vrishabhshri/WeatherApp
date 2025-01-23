@@ -13,9 +13,12 @@ export default function Home() {
   const [isLocationEntered, setLocationEntered] = useState(false)
   const [suggestions, setSuggestions] = useState<any>([])
   const [recents, setRecents] = useState<any>([]);
+  const [savedLat, setSavedLat] = useState<number>(0);
+  const [savedLon, setSavedLon] = useState<number>(0);
 
   const router = useRouter();
-  const APIKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
+  const OWAPIKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
+  const GoogleAPIKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
   const widgetBoxes = `border border-2 border-black rounded-lg 
                       w-full sm:w-40 md:w-44 lg:w-48 xl:w-52 h-24
                       sm:text-xs md:text-sm lg:text-base xl:text-lg
@@ -35,7 +38,7 @@ export default function Home() {
 
     try {
 
-      const response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=3&appid=${APIKey}`);
+      const response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=3&appid=${OWAPIKey}`);
       setSuggestions(response.data)
 
     }
@@ -74,7 +77,7 @@ export default function Home() {
 
     try {
 
-      const params: any = {appid: APIKey, units: 'imperial'};
+      const params: any = {appid: OWAPIKey, units: 'imperial'};
 
       // Updating params based on input type Zip Code/Coordinates/Location name
       if (isZipCode(selectedLocation)) {
@@ -98,7 +101,7 @@ export default function Home() {
       // Fetching weather, forecast, and uv index
       const weatherResponse = await axios.get('https://api.openweathermap.org/data/2.5/weather', { params });
       const { lat, lon } = weatherResponse.data.coord;
-      const uvResponse = await axios.get(`https://api.openweathermap.org/data/2.5/uvi?appid=${APIKey}&lat=${lat}&lon=${lon}`);
+      const uvResponse = await axios.get(`https://api.openweathermap.org/data/2.5/uvi?appid=${OWAPIKey}&lat=${lat}&lon=${lon}`);
       const forecastResponse = await axios.get('https://api.openweathermap.org/data/2.5/forecast', { params });
 
       const forecastList = forecastResponse.data.list;
@@ -114,9 +117,11 @@ export default function Home() {
       // Settin weather for easy access in html
       setWeather({ ...weatherResponse.data, uvIndex: uvResponse.data.value, condition: weatherResponse.data.weather[0].main, forecast: dailyForecast })
       // Notifying that a location has been entered
-      setLocationEntered(true)
+      setLocationEntered(true);
       // Clearing suggestions once a location has been selected
-      setSuggestions([])
+      setSuggestions([]);
+      setSavedLat(lat);
+      setSavedLon(lon);
       getRecents();
 
     }
@@ -217,7 +222,8 @@ export default function Home() {
                   ${weather !== null ? calcBackgroundColorFromCondition(weather.condition) : ''}
                   overflow-hidden`}>
 
-      <div>
+      {/* Left side of page */}
+      <div className=''>
 
         <div className='flex flex-row items-center'>
 
@@ -462,36 +468,57 @@ export default function Home() {
 
       </div>
 
-      {/* Recents */}
-      <div className={`ml-12 w-1/6 flex flex-col gap-4 max-h-[600px]
-                                              cursor-pointer overflow-y-auto no-scrollbar`}>
+      {/* Right side of page */}
+      <div className='flex flex-col justify-around ml-12 w-1/6 h-3/4'>
 
-          {recents.map((recent, index: number) => (
+        {/* Recents */}
+        {recents.length > 0 && <div className={`w-full flex flex-col gap-4 h-1/2
+                                                cursor-pointer overflow-y-auto no-scrollbar`}>
 
-            <div 
-            key={index} 
-            className='border border-2 border-black rounded-lg
-                        w-full h-12
-                        sm:text-xs md:text-sm lg:text-base xl:text-lg
-                        flex items-center justify-between
-                        transition-all duration-200
-                        hover:bg-gray-400' 
-            onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}
-            >
+            {recents.map((recent, index: number) => (
 
-              {/* <div className='ml-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
-                <Image src="/icons/update.svg" alt='Update icon' width={16} height={16}/>
-              </div> */}
+              <div 
+              key={index} 
+              className='border border-2 border-black rounded-lg
+                          w-full h-8
+                          sm:text-xs md:text-sm lg:text-base xl:text-lg
+                          flex items-center justify-between
+                          transition-all duration-200
+                          hover:bg-gray-400' 
+              onClick={() => {handleSearch(recent.lat + "," + recent.lon); setLocation(recent.lat + "," + recent.lon)}}
+              >
 
-              {recent.city}, {recent.country}
+                {/* <div className='ml-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
+                  <Image src="/icons/update.svg" alt='Update icon' width={16} height={16}/>
+                </div> */}
 
-              <div className='mr-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
-                <Image src="/icons/x.svg" alt='Delete icon' width={12} height={12}/>
+                <p className='ml-1'>{recent.city}, {recent.country}</p>
+
+                <div className='mr-1' onClick={(e) => { e.stopPropagation(); deleteLocation(recent._id); } }>
+                  <Image src="/icons/x.svg" alt='Delete icon' width={12} height={12}/>
+                </div>
+
               </div>
 
-            </div>
+            ))}
 
-          ))}
+        </div>}
+
+        {/* Google Map */}
+        {/* {weather && <div className=''>
+
+            <iframe
+            title='Google Map'
+            src={`https://www.google.com/maps/embed/v1/view?key=${GoogleAPIKey}&center=${savedLat},${savedLon}&zoom=12`}
+            width="100%"
+            height="100%"
+            style={{border: 0}}
+            loading='lazy'
+            >
+
+            </iframe>
+
+        </div>} */}
 
       </div>
 
