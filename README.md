@@ -33,6 +33,10 @@ Notes:
 my card to be charged. If unsure about where it would appear, it would appear in under the recents list, with the recents list being moved up.
 
 How to run:
+Website:
+https://weather-app-ten-gamma-10.vercel.app
+
+Locally:
 - npm install 
 - npm run dev
 - open http://localhost:3000 in your browser
